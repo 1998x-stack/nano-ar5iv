@@ -46,7 +46,18 @@ Output: recoveries/<plan_id>/plan.json, attempt-<uuid>.json, and a conversion at
     PYTHONPATH=src python -m unittest discover -s tests -v
     PYTHONPATH=src python -m compileall -q src tests
 
-The 23 additional tests check error evidence, source immutability, plan determinism and tamper detection, bounded attempts, and CLI behavior. Fake engine tests do NOT establish real conversion. A separate real Docker self-authored fragment smoke is included in CI; verify its status before reporting it as passed.
+The 23 additional tests check error evidence, source immutability, plan determinism and tamper detection, bounded attempts, and CLI behavior. Fake-engine tests do not establish real conversion. The separately configured real Docker smoke test PASSED, as shown in the evidence below.
+
+
+## Verified CI evidence (2026-11-06)
+
+- [GitHub Actions run #42192898339](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42192898339): 3 of 3 jobs succeeded for source commit 4ceb986d85d899537633120e729afeab1accf953.
+- Python 3.11: 64 unittest cases, 63 passed, 1 intentional skip (the real Docker test is executed in another job).
+- Python 3.13: 64 unittest cases, 63 passed, 1 intentional skip.
+- Real Docker job: successful M01 LaTeXML minimal sample, successful M02 discover/probe sample and successful M03 recover-wrapper explicit fragment sample. Pinned upstream image tag latexml/ar5ivist:2512.17, pulled registry digest sha256:9a8d577d6df6cdf088f1764c38bddab54d7c21c857fef68ae46ea3ff9676d70e.
+- Real M03 smoke log marker: M03_REAL_WRAPPER_PASS fd6cd5e0e922ebdb671acb3d57ed704534dae2fd9c941c59d09261caa3a62911 b910e1110611b7c499b1f79b625fe292e1cd91d2cc6ed0c7af4e5decd4a64547.
+- Assertion verifies original_files_unchanged=True, original and derived snapshot IDs differ, conversion manifest entry is __nano_ar5iv_wrapper.tex, single engine attempt succeeds, final status remains REVIEW_REQUIRED and quality_status NOT_EVALUATED.
+- This is a self-authored, trusted minimal fragment only. Independent scientific fidelity, math/references preservation, complex manuscript recovery and production sandbox audit were NOT_RUN.
 
 Remaining M03: autonomous fragment ordering, path/package/Bib/asset recovery, bounded multi-strategy retry scheduling, large real-paper evaluation and model-generated patch audit are NOT_IMPLEMENTED. M04/M05 scientific fidelity remains unvalidated.
 

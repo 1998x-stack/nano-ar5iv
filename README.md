@@ -220,7 +220,7 @@ out/<job_id>/
 
 **验证不能只看 conversion rate**：同时跟踪入口定位准确率、公式符号保留率、引用连通率、资产完整率、修复的净收益、错误接受率、CPU/内存/超时和恢复可追溯性。
 
-测试层次：`unit`、`contract`、`integration`、`e2e`、`security`、`performance`；真实 arXiv 论文须记录 ID、版本、许可和独立判断。M01 历史测试 16 项：15 通过、1 个真实 Docker 集成测试条件跳过；M02 新增 E01–E12 与安全测试（最终结果以 CI 为准），M03–M07 黄金集仍为占位，也没有科学保真度验收结果。
+测试层次：`unit`、`contract`、`integration`、`e2e`、`security`、`performance`；真实 arXiv 论文须记录 ID、版本、许可和独立判断。M01 历史测试 16 项：15 通过、1 个真实 Docker 集成测试条件跳过；M02 新增 E01–E12 与安全测试（最终结果以 CI 为准），M03 新增 23 项自编单测及真实 Docker 片段恢复冒烟（[CI](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42192898339)）；M04–M07 黄金集仍为占位，尚无科学保真度验收结果。
 
 TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执行层必须提供 archive path traversal 保护、no-network、无宿主凭据挂载、非 root、禁用 shell escape、CPU/内存/时间限额、HTML/SVG 隔离呈现；官方演示命令不等于生产隔离配置。
 
@@ -260,7 +260,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | M00 | 技术研究、代码体系和真实占位结构 | PR #1、#2 已合并 |
 | M01 | 源码快照、CLI、固定镜像适配、provenance | **自编最小样本 Docker/LaTeXML 已通过；生产安全/科研保真未验收，PR #4 待合入 main** |
 | M02 | 元数据、多 root、依赖图、ZIP/TAR、受限 top-k 探测 | **已通过 41 单测（40 通过、1 按配置跳过）及真实单样本 discover→probe；真实语料准确率/多候选试转换尚未验收** |
-| M03 | 首因诊断与显式包装片段（原文件不改写） | **首批代码与 23 项新测试；真实引擎及复杂恢复验收看 CI** |
+| M03 | 首因诊断与显式包装片段（原文件不改写） | **CI 通过：新增 23 测试，真实 Docker 片段包装成功；完整复杂恢复/保真未验收** |
 | M04 | Canonical PaperDocument 和交叉引用图 | 仅设计 |
 | M05 | 公式/引用/图表的质量门禁 | 仅设计 |
 | M06 | 队列、缓存、API、UI、部署 | 仅设计 |

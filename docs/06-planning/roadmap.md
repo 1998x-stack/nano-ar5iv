@@ -14,7 +14,7 @@
 
 ## M03 — Conservative Recovery
 
-**首批工程已实现**：首条错误与后续级联事件的启发式分类、显式 fragment 顺序和 class 的包装入口计划、独立内容寻址快照、原件哈希不变校验、单次受限尝试、审计计划和执行清单。**待完成**：自动顺序推断、缺宏包/路径/Bib 修复、多策略重试、真实论文语料与质量门禁。详见 [M03 recovery](../07-reproduction/m03-recovery.md)。
+**首批工程已实现**：首条错误与后续级联事件的启发式分类、显式 fragment 顺序和 class 的包装入口计划、独立内容寻址快照、原件哈希不变校验、单次受限尝试、审计计划和执行清单。**待完成**：自动顺序推断、缺宏包/路径/Bib 修复、多策略重试、真实论文语料与质量门禁。**已通过 CI**：[run #42192898339](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42192898339)；Python 3.11/3.13 各 64 测试（63 通过、1 跳过），真实 Docker 片段包装单次转换成功，原文件 hash 不变，结果仍 REVIEW_REQUIRED。详见 [M03 recovery](../07-reproduction/m03-recovery.md)。
 
 ## M04 — Canonical PaperDocument
 
