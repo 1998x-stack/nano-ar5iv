@@ -21,3 +21,7 @@ The existing `tests/unit`, `contract`, `integration`, `e2e`, `fixtures`, `securi
 ## 真实容器验收记录
 
 GitHub Actions 独立真实 Docker job 已通过最小 LaTeXML 转换、完整 CLI、manifest 与 artifact SHA-256 检查：[GitHub Actions M01 real CLI verification](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42189149532)。普通 Python 矩阵中的跳过仍是有意设计，真实集成由独立 job 执行。测试结果不代表任意 LaTeX 宏包都正确或生产沙箱已获安全验收。
+
+### M02 CI 验收
+- [GitHub Actions #42198296310](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42198296310)：Python 3.11/3.13 共 38 unittest/每个版本，36 通过、2 按普通矩阵跳过；独立真实 Docker 作业运行原 M01 与新增 M02 自动入口用例，全部通过。
+- 验证范围仅为自编最小论文、静态依赖及模拟引擎；不代表真实 arXiv 大型语料的入口定位准确率和科学保真合格。

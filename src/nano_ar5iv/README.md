@@ -2,7 +2,7 @@
 
 **Implemented in M01**: `domain/{source,provenance,diagnostics,states}.py`, `ports/engines.py`, `application/{ingest,convert}.py`, `infrastructure/{repositories,workspaces,sandbox}.py`, `adapters/latexml/{runner,diagnostics}.py`, `interfaces/cli.py`, and `__main__.py`.
 
-The rest of the module layout remains **docstring/TODO-only**. At M01 only the following behavior exists: content-addressed source directory snapshot, explicit .tex/.ltx entry, a single local Docker/ar5ivist conversion attempt, runtime stderr/logs/HTML capture, and a provenance manifest.
+**M02 implemented**: `source/arxiv_manifest.py`, `source/tex_scanner.py`, `source/dependency_graph.py`, `source/entry_ranker.py` and `application/discover.py`. The rest of the future modules remain docstring/TODO-only. At M01 only the following behavior exists: content-addressed source directory snapshot, explicit .tex/.ltx entry, a single local Docker/ar5ivist conversion attempt, runtime stderr/logs/HTML capture, and a provenance manifest.
 
 **Not implemented**: arXiv metadata auto discovery, .tar.gz parsing, multi-root handling, source recovery/LLM, Canonical PaperDocument, scientific fidelity validation, PDF fallback, durable batch jobs or HTTP API.
 

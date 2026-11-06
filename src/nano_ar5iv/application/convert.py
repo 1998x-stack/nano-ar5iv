@@ -27,7 +27,8 @@ def validate_entry(bundle: SourceBundle, entry: str) -> str:
 
 
 def convert_source(bundle: SourceBundle, entry: str, engine: ConversionEngine,
-                   store: ArtifactStore, timeout_seconds: int = 300) -> tuple[EngineAttempt, Path]:
+                   store: ArtifactStore, timeout_seconds: int = 300,
+                   selection: dict | None = None) -> tuple[EngineAttempt, Path]:
     entry = validate_entry(bundle, entry)
     run_id = uuid.uuid4().hex
     with attempt_workspace(bundle) as workspace:
@@ -51,5 +52,6 @@ def convert_source(bundle: SourceBundle, entry: str, engine: ConversionEngine,
                         "source_bundle_id": bundle.bundle_id, "root_entry": entry,
                         "engine_attempt": attempt.to_dict(),
                         "quality_status": "NOT_EVALUATED",
-                        "source_manifest": str(bundle.manifest_path)}
+                        "source_manifest": str(bundle.manifest_path),
+                        "entry_selection": selection or {"method": "explicit", "entry": entry}}
             return attempt, store.write_run(run_id, manifest, artifact_dir)

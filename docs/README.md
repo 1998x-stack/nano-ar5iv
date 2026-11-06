@@ -22,6 +22,11 @@
 
 **状态更新（M01）**：`src/nano_ar5iv/` 的源码快照、显式入口 Docker 转换适配和 CLI 已实现，`tests/` 包含实际单元/模拟用例；其余模块、configs、deployment 和完整科学验证仍是占位设计。真实 LaTeXML 基线与 CLI 在 GitHub Actions 已跑通并校验产物哈希，但科研保真门禁仍未实现。阅读 [M01 baseline](07-reproduction/m01-baseline.md)。
 
+## M02 真实功能
+
+- [M02 Entry Discovery 实现、CLI 与验收](07-reproduction/m02-entry-discovery.md)：arXiv 元数据主入口、静态依赖图、明确歧义状态、optional top-k trial、真实 Docker 测试。
+- 旧 M00 的架构设计和 M01 的基线说明依然保留，M03–M07 文档属于规划，不代表已经实现。
+
 ## 文档约定
 
 - 使用 `[F]` 表示核实的外部事实、`[O]` 表示外部报告/意见、`[D]` 表示本项目设计决策、`[H]` 表示待验证假设。
