@@ -156,10 +156,11 @@ class EntryDiscoveryTests(unittest.TestCase):
         self.assertEqual(a["algorithm_version"], "m02.1")
 
     def test_scanner_escaped_percent_and_inline_verbatim(self):
-        scan = scan_tex("\\\\% valid escaped percent\\n"
-                        "% \\\\input{fake}\\n"
-                        "\\\\input{real}\\n"
-                        "\\\\verb+\\\\input{hidden}+\\n")
+        source = (r"\% valid escaped percent" + "\n"
+                  + r"% \input{fake}" + "\n"
+                  + r"\input{real}" + "\n"
+                  + r"\verb+\input{hidden}+" + "\n")
+        scan = scan_tex(source)
         self.assertEqual([r.value for r in scan.references if r.kind == "input"], ["real"])
 
 
