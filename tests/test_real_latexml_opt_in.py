@@ -1,4 +1,7 @@
-"""Real Docker integration is opt-in and requires a pre-pulled image."""
+"""Real Docker integration is opt-in and requires a pre-pulled image.
+
+On failure, include captured container stdout/stderr in the assertion message.
+"""
 import os
 import tempfile
 import unittest
