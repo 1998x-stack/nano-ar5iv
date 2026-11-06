@@ -37,3 +37,22 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Byte-compile modules
         run: python -m compileall -q src tests
+
+  real-latexml-smoke:
+    name: Real LaTeXML/ar5ivist smoke test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install local package
+        run: python -m pip install -e .
+      - name: Pull the explicitly versioned upstream image
+        run: docker pull latexml/ar5ivist:2512.17
+      - name: Run the self-authored TeX integration fixture
+        env:
+          RUN_REAL_LATEXML: "1"
+        run: python -m unittest discover -s tests -p 'test_real_latexml_opt_in.py' -v
