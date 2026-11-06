@@ -1,10 +1,13 @@
-"""ARCHITECTURE PLACEHOLDER: domain/diagnostics.py
+"""Small, versioned conversion diagnostics model (M01 baseline)."""
+from __future__ import annotations
+from dataclasses import asdict, dataclass
 
-Planned responsibility: typed failure events and first-cause evidence.
-Phase: M01–M04.
-Input/output contracts: docs/04-architecture/module-catalog.md.
-Workflow design: docs/04-architecture/reproduction-blueprint.md.
 
-TODO: define interfaces, implement logic and add tests in the planned phase.
-Current runtime behavior: none. No converters or services are implemented.
-"""
+@dataclass(frozen=True, slots=True)
+class Diagnostic:
+    severity: str
+    message: str
+    source: str = "latexml"
+
+    def to_dict(self) -> dict:
+        return asdict(self)
