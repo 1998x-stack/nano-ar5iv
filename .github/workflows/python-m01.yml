@@ -56,3 +56,33 @@ jobs:
         env:
           RUN_REAL_LATEXML: "1"
         run: python -m unittest discover -s tests -p 'test_real_latexml_opt_in.py' -v
+
+      - name: Run complete M01 CLI and check checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          nano-ar5iv --output "$RUNNER_TEMP/nano-ar5iv-e2e" convert \
+            examples/trusted-minimal --entry manuscript.tex --timeout 300 \
+            > "$RUNNER_TEMP/nano-result.json"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads((Path(os.environ["RUNNER_TEMP"]) / "nano-result.json").read_text())
+          assert result["status"] == "SUCCEEDED", result
+          assert result["quality_status"] == "NOT_EVALUATED", result
+          path = Path(result["manifest_path"])
+          manifest = json.loads(path.read_text())
+          assert manifest["root_entry"] == "manuscript.tex"
+          assert manifest["engine_attempt"]["image_id"].startswith("sha256:")
+          assert manifest["engine_attempt"]["exit_code"] == 0
+          artifacts = {f["path"]: f for f in manifest["artifacts"]}
+          assert "html/index.html" in artifacts, artifacts
+          for name, record in artifacts.items():
+              data = (path.parent / "artifacts" / name).read_bytes()
+              assert hashlib.sha256(data).hexdigest() == record["sha256"], name
+          print("M01_REAL_CLI_E2E_PASS", manifest["source_bundle_id"],
+                manifest["engine_attempt"]["image_id"], len(artifacts))
+          PY
