@@ -20,7 +20,7 @@
 - [故障根因排查](07-reproduction/failure-triage.md)：异常分类、停止条件。
 - [M01–M07 逐文件实施步骤](07-reproduction/implementation-slices.md)：模块、阶段、验收。
 
-当前 `src/nano_ar5iv/`、`tests/`、`configs/`、`deployment/`、`examples/` 等目录**已创建为占位结构**，但不包含业务逻辑、转换引擎、可运行测试或部署文件。
+**状态更新（M01）**：`src/nano_ar5iv/` 的源码快照、显式入口 Docker 转换适配和 CLI 已实现，`tests/` 包含实际单元/模拟用例；其余模块、configs、deployment 和完整科学验证仍是占位设计。真实 Docker LaTeXML 转换尚未验证。阅读 [M01 baseline](07-reproduction/m01-baseline.md)。
 
 ## 文档约定
 

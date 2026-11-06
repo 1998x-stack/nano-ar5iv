@@ -1,10 +1,21 @@
-"""ARCHITECTURE PLACEHOLDER: infrastructure/workspaces.py
+"""Copy-on-write isolated attempt workspaces (M01); repairs reserved for M03."""
+from __future__ import annotations
+import os
+import shutil
+import tempfile
+from contextlib import contextmanager
+from pathlib import Path
+from typing import Iterator
+from nano_ar5iv.domain.source import SourceBundle
 
-Planned responsibility: isolated copy-on-write workspaces.
-Phase: M01–M06.
-Input/output contracts: docs/04-architecture/module-catalog.md.
-Workflow design: docs/04-architecture/reproduction-blueprint.md.
 
-TODO: define interfaces, implement logic and add tests in the planned phase.
-Current runtime behavior: none. No converters or services are implemented.
-"""
+@contextmanager
+def attempt_workspace(bundle: SourceBundle) -> Iterator[Path]:
+    with tempfile.TemporaryDirectory(prefix="nano-ar5iv-attempt-") as tmp:
+        dest = Path(tmp).resolve() / "input"
+        shutil.copytree(bundle.source_root, dest)
+        for root, dirs, files in os.walk(dest):
+            os.chmod(root, 0o755)
+            for name in files:
+                os.chmod(Path(root) / name, 0o644)
+        yield dest

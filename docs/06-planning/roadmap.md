@@ -1,4 +1,4 @@
-# 15｜分阶段交付路线图（尚未执行）
+# 15｜分阶段交付路线图（M01 代码已提交，真实引擎验收待运行）
 
 ## M00 — Documentation & Evidence（本 PR 目标）
 
@@ -6,7 +6,7 @@
 
 ## M01 — Foundation + Real Baseline
 
-交付计划：`pyproject.toml`、`domain` 结构、最简 CLI、固定 LaTeXML/ar5ivist 镜像、单篇有效论文转换、日志与产物保存。**验收**：最小真实样本端到端输出、版本和哈希可核验；暂不自动修复。
+**已实现（PR #3）**：Python 包/CLI、SHA256 内容寻址源码快照、显式入口、Docker ar5ivist 单次转换适配、诊断日志及 artifact manifest、15 个通过的 unittest 和一个条件跳过的真实集成测试。**尚未完成验收**：当前环境无 Docker/LaTeXML，真实 TeX→HTML 未运行，容器安全/性能与科学保真未验证。详见 [M01 baseline](../07-reproduction/m01-baseline.md)。
 
 ## M02 — Entrypoint Discovery
 
