@@ -10,7 +10,7 @@
 
 ## M02 — Entrypoint Discovery
 
-**已实现（M02 分支）**：现代/旧版 00README、源码清单和哈希验证、受限 ZIP/TAR 暂存、静态依赖图、候选评分、多 root 与 review-required、CLI discover 和唯一入口自动 convert。E01–E12 与附加安全单测已编写。**尚待验收**：真实 arXiv 样本准确率、top-k 引擎试转换、复杂 TeX 宏解析、Docker 实机回归。见 [M02 实施报告](../07-reproduction/m02-entry-discovery.md)。
+**已实现（M02 分支）**：现代/旧版 00README、源码清单和哈希验证、受限 ZIP/TAR 暂存、静态依赖图、候选评分、多 root 与 review-required、CLI discover、唯一入口自动 convert 和受限显式 top-k probe。E01–E12 与附加安全/假引擎探测单测已编写。**尚待验收**：真实 arXiv 样本准确率、top-k 引擎试转换、复杂 TeX 宏解析、Docker 实机回归。见 [M02 实施报告](../07-reproduction/m02-entry-discovery.md)。
 
 ## M03 — Conservative Recovery
 

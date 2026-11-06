@@ -7,6 +7,7 @@ import sys
 import tempfile
 from pathlib import Path
 from nano_ar5iv.application.discover import discover_entries
+from nano_ar5iv.application.probe import probe_candidates
 from nano_ar5iv.source.archive import extract_archive
 from nano_ar5iv.application.convert import convert_source
 from nano_ar5iv.application.ingest import ingest_source
@@ -23,6 +24,11 @@ def main(argv: list[str] | None = None) -> int:
     inspect.add_argument("source", type=Path)
     discover = sub.add_parser("discover", help="metadata-first entry discovery (no conversion)")
     discover.add_argument("source", type=Path)
+    probe = sub.add_parser("probe", help="explicit bounded candidate trial; trusted source only")
+    probe.add_argument("source", type=Path)
+    probe.add_argument("--top-k", type=int, default=3)
+    probe.add_argument("--timeout", type=int, default=90)
+    probe.add_argument("--image", default="latexml/ar5ivist:2512.17")
     convert = sub.add_parser("convert", help="one baseline conversion; optional safe auto-entry")
     convert.add_argument("source", type=Path)
     convert.add_argument("--entry", help="explicit .tex/.ltx entry; otherwise requires one unambiguous discovered root")
@@ -57,6 +63,16 @@ def main(argv: list[str] | None = None) -> int:
                               "selected_roots": decision["decision"]["selected_roots"],
                               "diagnostics": decision["decision"]["diagnostics"]}, ensure_ascii=False, indent=2))
             return 0 if decision["decision"]["status"] in {"SELECTED", "MULTIPLE_ROOTS", "PDF_ONLY"} else 2
+        if args.cmd == "probe":
+            findings = probe_candidates(bundle, Ar5ivistEngine(DockerRuntime(image=args.image)),
+                                        ArtifactStore(output), args.top_k, args.timeout)
+            directory = output / "probes" / bundle.bundle_id
+            directory.mkdir(parents=True, exist_ok=True)
+            summary = directory / "probe-summary.json"
+            summary.write_text(json.dumps(findings, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(json.dumps({"summary_path": str(summary), **findings}, ensure_ascii=False, indent=2))
+            return 0 if findings["attempts"] and all(
+                a["status"] == "SUCCEEDED" for a in findings["attempts"]) else 2
         entry = args.entry
         if entry is None:
             decision = discover_entries(bundle)["decision"]
