@@ -178,7 +178,7 @@ class M05GateTests(unittest.TestCase):
 
     def test_unsupported_golden_fields_and_no_review_provenance(self):
         data = golden_data()
-        del data["expected"]["mathematics"] if "mathematics" in data["expected"] else data["expected"]["sections"]
+        del data["expected"]["sections"]
         with self.assertRaises(InvalidGolden):
             reference(data)
         data = golden_data()
