@@ -6,7 +6,7 @@
 
 ## M01 — Foundation + Real Baseline
 
-**已实现（PR #3）**：Python 包/CLI、SHA256 内容寻址源码快照、显式入口、Docker ar5ivist 单次转换适配、诊断日志及 artifact manifest、15 个通过的 unittest 和一个条件跳过的真实集成测试。**尚未完成验收**：当前环境无 Docker/LaTeXML，真实 TeX→HTML 未运行，容器安全/性能与科学保真未验证。详见 [M01 baseline](../07-reproduction/m01-baseline.md)。
+**已实现（PR #3）**：Python 包/CLI、SHA256 内容寻址源码快照、显式入口、Docker ar5ivist 单次转换适配、诊断日志及 artifact manifest、15 个通过的 unittest 和一个条件跳过的真实集成测试。**新增验收证据**：GitHub-hosted Linux runner 已成功运行固定 ar5ivist 镜像、真实 LaTeX→HTML 与正式 CLI 产物哈希校验（[GitHub Actions M01 real CLI verification](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42189149532)）；生产级沙箱安全、复杂论文兼容性、性能及科学保真仍未验证。详见 [M01 baseline](../07-reproduction/m01-baseline.md)。
 
 ## M02 — Entrypoint Discovery
 

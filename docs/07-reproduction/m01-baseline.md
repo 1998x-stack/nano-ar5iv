@@ -71,3 +71,13 @@ Unverified: real Docker/ar5ivist conversion, real TeX→HTML/MathML, font/packag
 Next gate: verify one *real* Docker run with recorded image digest, XML/HTML/logs and source hashes; then implement M02 metadata-first entry discovery with actual fixtures.
 
 Related: [Reproduction blueprint](../04-architecture/reproduction-blueprint.md) · [Security](../05-quality/security.md) · [Experiment matrix](experiment-matrix.md).
+
+
+## Verified real CI run: 2026-11-06
+
+- [Workflow run #42189149532](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42189149532): all three jobs passed — Python 3.11 and 3.13 unit matrix, real ar5ivist smoke conversion **and** the full `nano-ar5iv convert` CLI.
+- The CLI read back its JSON manifest, required status `SUCCEEDED` and quality status `NOT_EVALUATED`, verified explicit entry `manuscript.tex`, inspected the Docker image ID and exit=0, confirmed `html/index.html` exists, and recalculated SHA256 for **all 4 produced artifacts**.
+- Captured source bundle SHA256: `03bcf80d0c08bcf50605cfa681aedceccbd660b26dee6dee99171ff9fde0eb10`.
+- Inspected local image ID: `sha256:c221bea1ad4852946acf50d59cb6a5550c54c550e047cf48df872f7ef3f70638`. Image registry pull manifest digest: `sha256:9a8d577d6df6cdf088f1764c38bddab54d7c21c857fef68ae46ea3ff9676d70e`; **these identifiers are different types and must not be conflated**.
+- Root-cause debugging: initial Docker smoke failed with exit code **125**, as `--mount type=bind,src=...,dst=/docdir,rw` is invalid; Docker `--mount` bind is writable by default. The exact error was captured in [failed run #42188492703](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42188492703). Removing `,rw` and adding an assertion in `tests/test_docker_runtime.py` fixed it. Official reference: https://docs.docker.com/engine/storage/bind-mounts/ .
+- This proves the M01 **single trusted sample** end-to-end baseline, not author-provided arXiv corpus support, MathML/citation correctness at scale, or production sandbox security.

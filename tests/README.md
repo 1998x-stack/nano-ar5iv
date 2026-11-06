@@ -17,3 +17,7 @@ Local result on 2026-11-06: **16 test cases, 15 pass, 1 skip**. Only tests again
 The existing `tests/unit`, `contract`, `integration`, `e2e`, `fixtures`, `security` and `performance` directories still contain only `.gitkeep` placeholders for M02–M07.
 
 [Experiment matrix](../docs/07-reproduction/experiment-matrix.md) · [M01 implementation record](../docs/07-reproduction/m01-baseline.md).
+
+## 真实容器验收记录
+
+GitHub Actions 独立真实 Docker job 已通过最小 LaTeXML 转换、完整 CLI、manifest 与 artifact SHA-256 检查：[GitHub Actions M01 real CLI verification](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42189149532)。普通 Python 矩阵中的跳过仍是有意设计，真实集成由独立 job 执行。测试结果不代表任意 LaTeX 宏包都正确或生产沙箱已获安全验收。
