@@ -2,10 +2,10 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.2 Architecture Scaffold / 仅设计与占位文件。尚无可运行的 nano-ar5iv 转换功能。**  
+**项目状态：v0.3 M01 Engineering Baseline — 已实现源码快照、显式入口转换 CLI、Docker 引擎适配与产物记录。**真实 LaTeXML Runner 与完整 CLI 转换已在 GitHub Actions 验证通过**；仅科学保真与 M02–M07 仍未验收或实现。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
-> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库的 `src/` 内文件均为无逻辑占位模块，不可将其视为已实现功能。
+> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库仅部分 M01 模块已有真实逻辑，其余模块仍是占位文件；输出 HTML 不代表论文科学内容保真。
 
 ## 目录
 
@@ -90,11 +90,11 @@ ar5iv/LaTeXML 让许多 LaTeX 论文拥有网页可读的 HTML5/MathML：它从*
 |---|---|---|
 | 技术原理与外部调研 | **已有文档** | [技术文档](docs/README.md)、[参考来源](docs/REFERENCES.md) |
 | README 与复现计划 | **已有设计** | 本文及 `docs/07-reproduction/` |
-| `src/nano_ar5iv` 代码层次 | **真实占位文件** | 仅模块 docstring / TODO，零业务实现 |
-| `tests/`、`configs/`、`deployment/` | **真实占位目录** | `.gitkeep` 与用途说明，无可执行用例 |
-| LaTeXML 转换/源码恢复/质量检查 | **未实现** | 不提供 nano-ar5iv CLI/API |
+| `src/nano_ar5iv` 代码层次 | **M01 部分已实现** | 真实 snapshot、CLI、Docker adapter；其他模块仍为占位 |
+| `tests/`、`configs/`、`deployment/` | **已有单元测试** | 本地 15 通过/1 条条件跳过；GitHub CI 的独立真实 Docker/CLI 测试通过；configs/deployment 仍占位 |
+| LaTeXML 转换/源码恢复/质量检查 | **M01 CLI + 引擎适配已实现** | 显式入口，单次基线；未实测 LaTeXML，未实现恢复/质量判断/API |
 | 官方上游手动转换演示 | **外部命令可参考** | 不等于本项目测试通过 |
-| Docker 镜像、部署、性能 | **未实现、未验证** | 不标记 production-ready |
+| Docker 镜像、部署、性能 | **调用参数已设计/实现** | 没有提供镜像，也未实际验证运行或完成安全审计 |
 
 **严格约束**：不擅自修改原始论文、不根据模型猜测补写科学结论；未通过公式/引用质量门禁的结果不得标记 VERIFIED；不自动连接互联网安装不可信 TeX 宏包。
 
@@ -125,17 +125,19 @@ latexmlpost --format=html5 --destination=manuscript.html manuscript.xml
 
 **预期采集而非臆测的产物**：源码包哈希、入口选择证据、XML/HTML、图像、转换日志、引擎版本、配置、计时、公式/引用/图表计数、人工差分结论。完整可复现记录模板见 [Upstream Reproduction](docs/07-reproduction/README.md)。
 
-### 未来计划中的 nano-ar5iv CLI（不可执行）
+### 已实现的 M01 CLI（可执行源码快照；转换需要 Docker）
 
-~~~text
-nano-ar5iv inspect  paper.tar.gz --report inventory.json
-nano-ar5iv discover paper.tar.gz --report entries.json
-nano-ar5iv convert  paper.tar.gz --engine latexml --output out/
-nano-ar5iv evaluate out/ --report quality.json
-nano-ar5iv replay   job-manifest.json --output replay/
+~~~bash
+python -m pip install -e .
+nano-ar5iv --output ./run-data inspect ./examples/trusted-minimal
+# 先在可信环境手动 docker pull latexml/ar5ivist:2512.17
+nano-ar5iv --output ./run-data convert ./examples/trusted-minimal \
+  --entry manuscript.tex --image latexml/ar5ivist:2512.17 --timeout 300
 ~~~
 
-上述仅是**设计用命令契约**。本次不创建 CLI entrypoint 或实现工具。
+输出包括 SourceBundle 哈希、显式 root、EngineAttempt、图像 ID、日志和 artifact manifest；所有结果仍标记 `quality_status=NOT_EVALUATED`。本地执行环境没有 Docker；GitHub-hosted runner 已完成**真实转换及正式 CLI 产物 SHA-256 验证**。证据：[GitHub Actions M01 real CLI verification](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42189149532)。完整操作步骤与测试证据见 [M01 Baseline](docs/07-reproduction/m01-baseline.md)。
+
+计划中的 `discover`、`evaluate`、`replay` 以及读取 `.tar.gz` 的 CLI 功能**仍未实现**。
 
 ## 五、九大代码 Category 与仓库结构
 
@@ -158,10 +160,10 @@ nano-ar5iv/
 │       ├── infrastructure/       # 08 沙箱/缓存/存储/任务状态
 │       ├── interfaces/           # 09 CLI/API（尚未实现）
 │       └── ports/                # 协议边界（无实现）
-├── tests/                        # 目录、fixture 类别占位
+├── tests/                        # M01 单元/模拟测试 + 未来 fixture 类别占位
 ├── configs/                      # 配置计划占位
 ├── deployment/                   # Docker/运行编排占位（无镜像）
-├── examples/                     # 可公开、可复现样本占位
+├── examples/                     # M01 自编 minimal TeX + 后续样本占位
 └── scripts/                      # 未来工具占位，无可执行文件
 ~~~
 
@@ -218,7 +220,7 @@ out/<job_id>/
 
 **验证不能只看 conversion rate**：同时跟踪入口定位准确率、公式符号保留率、引用连通率、资产完整率、修复的净收益、错误接受率、CPU/内存/超时和恢复可追溯性。
 
-测试层次：`unit`、`contract`、`integration`、`e2e`、`security`、`performance`；真实 arXiv 论文须记录 ID、版本、许可和独立判断。测试 fixture 目录目前**全部只是占位**，没有任何黄金集通过的声明。
+测试层次：`unit`、`contract`、`integration`、`e2e`、`security`、`performance`；真实 arXiv 论文须记录 ID、版本、许可和独立判断。M01 有 16 个 unittest：本地/普通 CI 15 通过、1 个真实 Docker 测试条件跳过；独立 GitHub CI 已运行并通过该真实测试及正式 CLI artifact hash E2E。**科学内容保真仍未验收**，后续 M02–M07 黄金集仍为占位。
 
 TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执行层必须提供 archive path traversal 保护、no-network、无宿主凭据挂载、非 root、禁用 shell escape、CPU/内存/时间限额、HTML/SVG 隔离呈现；官方演示命令不等于生产隔离配置。
 
@@ -235,6 +237,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | 宏包/源码损坏如何修复 | [recovery playbook](docs/02-source-recovery/recovery-playbook.md) |
 | 官方资料、论文与社区评论 | [landscape](docs/03-research/landscape.md) / [issues](docs/03-research/issue-analysis.md) |
 | 总架构 | [system architecture](docs/04-architecture/system-architecture.md) |
+| **M01 实现与测试证据** | [M01 baseline](docs/07-reproduction/m01-baseline.md) |
 | **端到端函数级复现蓝图** | [reproduction blueprint](docs/04-architecture/reproduction-blueprint.md) |
 | **实际占位文件目录与模块契约** | [module catalog](docs/04-architecture/module-catalog.md) |
 | Category 与依赖规则 | [code categories](docs/04-architecture/code-categories.md) |
@@ -252,8 +255,8 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 
 | 阶段 | 目标 | 当前状态 |
 |---|---|---|
-| M00 | 技术研究、代码体系和真实占位结构 | **本次设计交付** |
-| M01 | 可重复的 LaTeXML baseline + provenance | 仅设计 |
+| M00 | 技术研究、代码体系和真实占位结构 | 已提交 PR #2、尚待合并 |
+| M01 | 源码快照、CLI、固定镜像适配、provenance | **M01 基线与真实 Docker/CLI 端到端验收通过；科学保真不在 M01 范围** |
 | M02 | 元数据优先的多 root 入口发现 | 仅设计 |
 | M03 | 有界恢复和独立修复工作区 | 仅设计 |
 | M04 | Canonical PaperDocument 和交叉引用图 | 仅设计 |

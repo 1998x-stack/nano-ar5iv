@@ -1,10 +1,10 @@
-"""ARCHITECTURE PLACEHOLDER: domain/states.py
+"""M01 operation status; richer job state machine is scheduled for M06."""
+from enum import StrEnum
 
-Planned responsibility: bounded job/quality states.
-Phase: M01–M04.
-Input/output contracts: docs/04-architecture/module-catalog.md.
-Workflow design: docs/04-architecture/reproduction-blueprint.md.
 
-TODO: define interfaces, implement logic and add tests in the planned phase.
-Current runtime behavior: none. No converters or services are implemented.
-"""
+class AttemptStatus(StrEnum):
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
+    TIMED_OUT = "TIMED_OUT"
+    ENGINE_UNAVAILABLE = "ENGINE_UNAVAILABLE"
+    OUTPUT_MISSING = "OUTPUT_MISSING"

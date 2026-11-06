@@ -1,15 +1,16 @@
-# Architecture-only package metadata; not a working converter or CLI.
-# LaTeXML, ar5ivist and Python runtime dependencies are NOT installed here.
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "nano-ar5iv"
-version = "0.0.0"
-description = "Placeholder architecture for reliable LaTeX scientific document conversion"
+version = "0.1.0"
+description = "Auditable LaTeX scientific paper conversion baseline"
 requires-python = ">=3.11"
 dependencies = []
+
+[project.scripts]
+nano-ar5iv = "nano_ar5iv.interfaces.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
