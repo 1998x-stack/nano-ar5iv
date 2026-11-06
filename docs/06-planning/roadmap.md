@@ -2,7 +2,7 @@
 
 ## M00 — Documentation & Evidence（本 PR 目标）
 
-交付：原理、源码恢复、外部博客及 issue 研究、架构/目录、IR 契约、威胁模型、测试矩阵、ADR。验收：所有文档均有导航，重要外部事实可追溯，明确“没有代码实现”。**状态：文档提交待审。**
+交付：原理、源码恢复、外部博客及 issue 研究、架构/目录、IR 契约、威胁模型、测试矩阵、ADR。M00-B 进一步添加完整 README、逐文件复现与时序设计、50 个 docstring-only .py 模块、14 个 __init__ 包占位及 tests/configs/deployment/examples/scripts 等真实占位目录。**状态：文档与源码占位已提交 PR 待审；业务代码、转换测试、运行服务均未实现。**
 
 ## M01 — Foundation + Real Baseline
 
