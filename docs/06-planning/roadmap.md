@@ -6,11 +6,11 @@
 
 ## M01 — Foundation + Real Baseline
 
-**已实现（PR #3）**：Python 包/CLI、SHA256 内容寻址源码快照、显式入口、Docker ar5ivist 单次转换适配、诊断日志及 artifact manifest、15 个通过的 unittest 和一个条件跳过的真实集成测试。**尚未完成验收**：当前环境无 Docker/LaTeXML，真实 TeX→HTML 未运行，容器安全/性能与科学保真未验证。详见 [M01 baseline](../07-reproduction/m01-baseline.md)。
+**已实现（PR #3）**：Python 包/CLI、SHA256 内容寻址源码快照、显式入口、Docker ar5ivist 单次转换适配、诊断日志及 artifact manifest、15 个通过的 unittest 和一个条件跳过的真实集成测试。**自编最小样本真实转换已在 GitHub Actions 通过**：修复 Docker bind mount 参数后 CI 成功；仍未完成生产沙箱安全、性能与科学保真评估，待 PR #4 合入 main。详见 [M01 baseline](../07-reproduction/m01-baseline.md)。
 
 ## M02 — Entrypoint Discovery
 
-**已实现（M02 分支）**：现代/旧版 00README、源码清单和哈希验证、受限 ZIP/TAR 暂存、静态依赖图、候选评分、多 root 与 review-required、CLI discover、唯一入口自动 convert 和受限显式 top-k probe。E01–E12 与附加安全/假引擎探测单测已编写。**尚待验收**：真实 arXiv 样本准确率、top-k 引擎试转换、复杂 TeX 宏解析、Docker 实机回归。见 [M02 实施报告](../07-reproduction/m02-entry-discovery.md)。
+**已实现（M02 分支）**：现代/旧版 00README、源码清单和哈希验证、受限 ZIP/TAR 暂存、静态依赖图、候选评分、多 root 与 review-required、CLI discover、唯一入口自动 convert 和受限显式 top-k probe。E01–E12 与附加安全/假引擎探测单测已编写。**已核实**：Python 3.11/3.13 各 41 项测试（40 pass、1 skip）以及自编样本真实 Docker discover→probe（[CI run](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42190208723)）。**尚待验收**：真实 arXiv 样本准确率、多候选真实试转换、复杂 TeX 宏解析与生产安全审查。见 [M02 实施报告](../07-reproduction/m02-entry-discovery.md)。
 
 ## M03 — Conservative Recovery
 

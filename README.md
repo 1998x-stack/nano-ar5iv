@@ -2,7 +2,7 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.4 M02 Entry Discovery — M01 源码快照与转换基线、M02 元数据优先入口发现/静态依赖图/ZIP-TAR 暂存已有代码；真实 LaTeXML 转换及 M02 真实论文准确率未验收，M03–M07 尚未实现。**  
+**项目状态：v0.4 M02 Entry Discovery — M01 源码快照与转换基线、M02 元数据优先入口发现/静态依赖图/ZIP-TAR 暂存已有代码；已通过自编样本的真实 Docker/LaTeXML 转换及 M02 discover→probe 验证；真实 arXiv 语料准确率尚未验收，M03–M07 尚未实现。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
 > nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库 M01/M02 部分模块已有真实逻辑，M03–M07 仍为占位文件；输出 HTML 不代表论文科学内容保真。
@@ -257,8 +257,8 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | 阶段 | 目标 | 当前状态 |
 |---|---|---|
 | M00 | 技术研究、代码体系和真实占位结构 | PR #1、#2 已合并 |
-| M01 | 源码快照、CLI、固定镜像适配、provenance | **首批功能完成；真实 Docker/LaTeXML 验收待执行** |
-| M02 | 元数据、多 root、依赖图、ZIP/TAR、受限 top-k 探测 | 代码与自编测试已提交；top-k 真实引擎与语料验证未完成 |
+| M01 | 源码快照、CLI、固定镜像适配、provenance | **自编最小样本 Docker/LaTeXML 已通过；生产安全/科研保真未验收，PR #4 待合入 main** |
+| M02 | 元数据、多 root、依赖图、ZIP/TAR、受限 top-k 探测 | **已通过 41 单测（40 通过、1 按配置跳过）及真实单样本 discover→probe；真实语料准确率/多候选试转换尚未验收** |
 | M03 | 有界恢复和独立修复工作区 | 仅设计 |
 | M04 | Canonical PaperDocument 和交叉引用图 | 仅设计 |
 | M05 | 公式/引用/图表的质量门禁 | 仅设计 |
