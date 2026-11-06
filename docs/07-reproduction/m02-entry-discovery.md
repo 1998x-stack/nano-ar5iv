@@ -107,3 +107,15 @@ nano-ar5iv --output ./run-data discover ./paper --probe --top-k 2 --timeout 120
 ## 后续阶段
 
 M03 处理缺入口 wrapper/缺宏包/源文件修复和有界重试；M04 负责 XML→PaperDocument；M05 才建立数学公式、图表与参考文献的科学保真硬门禁。它们不属于 M02 已实现功能。
+
+## 2026-11-06 CI 真实验收证据
+
+[GitHub Actions #42198296310](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42198296310) 已完成，三个作业全部成功：
+
+- Python 3.11：38 个 unittest，36 通过，2 个真实 Docker 用例按常规矩阵配置跳过；`compileall` 成功。
+- Python 3.13：同一测试集结果通过；`compileall` 成功。
+- 独立真实 Docker 作业：原 M01 自编论文转换成功；**M02 `test_auto_main_from_arxiv_metadata_converts_to_html` 通过**，从 `00README.json` 自动识别 `draft.tex`，调用 ar5ivist，确认 `html/index.html` 非空，manifest 记录 `metadata_source` 和 `quality_status=NOT_EVALUATED`；M01 完整 CLI 产物 SHA256 校验也通过。
+
+最初一轮 [失败作业 #42197817043](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42197817043) 发现测试字符串的 TeX 反斜杠被双重转义，导致静态扫描测试无法识别命令；更正为原始 TeX 字符串后通过。这里修复的是**测试夹具问题**，不能误报为引擎修复。
+
+**证据边界**：真实 Docker 仅使用自编最小论文样本；此结果不能证明对真实 arXiv 全语料、复杂动态宏、多入口真实大包的普遍成功率，也不能替代 M05 对公式、参考文献与图表的科学保真验收。

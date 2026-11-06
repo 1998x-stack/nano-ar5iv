@@ -1,4 +1,4 @@
-# 15｜分阶段交付路线图（M01 已验收、M02 代码验证中）
+# 15｜分阶段交付路线图（M01/M02 基线已通过 CI，科学保真待验证）
 
 ## M00 — Documentation & Evidence（本 PR 目标）
 
@@ -10,7 +10,7 @@
 
 ## M02 — Entrypoint Discovery
 
-**已实现（PR #7）**：`00README.json`/legacy 入口、静态 TeX 命令扫描、依赖边、候选评分与多 root 选择、拒绝歧义/无效清单、可选 top-k 试转换（仅作为观察，不宣称科学正确）、CLI 自动入口和逐篇多根转换。**本阶段验收**：M02 单元/模拟集成测试、真实 ar5ivist 元数据驱动转换、回归 M01；仍需更大真实 arXiv 样本评价入口准确率。[M02 documentation](../07-reproduction/m02-entry-discovery.md)。
+**已实现（PR #7）**：`00README.json`/legacy 入口、静态 TeX 命令扫描、依赖边、候选评分与多 root 选择、拒绝歧义/无效清单、可选 top-k 试转换（仅作为观察，不宣称科学正确）、CLI 自动入口和逐篇多根转换。**阶段基线验收已通过**：[GitHub Actions #42198296310](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42198296310) 中 Python 3.11/3.13 单元与模拟测试、真实 ar5ivist 元数据驱动自动入口 HTML 转换及原 M01 转换都成功；仍需更大真实 arXiv 样本评价入口准确率、复杂宏包兼容与科学保真。[M02 documentation](../07-reproduction/m02-entry-discovery.md)。
 
 ## M03 — Conservative Recovery
 

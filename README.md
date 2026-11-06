@@ -2,7 +2,7 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.4 M02 Entrypoint Discovery — M01 真实 ar5ivist 基线已验证；M02 新增 arXiv 元数据、依赖图、自动选择/多入口与显式歧义诊断。M02 CI 持续验证中；M03–M07 尚未实现，科学保真尚未验收。**  
+**项目状态：v0.4 M02 Entrypoint Discovery — M01 真实 ar5ivist 基线已验证；M02 新增 arXiv 元数据、依赖图、自动选择/多入口与显式歧义诊断。M02 自动入口真实 Docker 集成、Python 3.11/3.13 CI 均已通过；M03–M07 尚未实现，科学保真尚未验收。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
 > nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线和 M02 入口发现；恢复、PaperDocument、科学质量门禁及后台服务仍是占位。输出 HTML 不代表论文科学内容保真。
@@ -259,7 +259,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 |---|---|---|
 | M00 | 技术研究、代码体系和真实占位结构 | 已提交 PR #2、尚待合并 |
 | M01 | 源码快照、CLI、固定镜像适配、provenance | **M01 基线与真实 Docker/CLI 端到端验收通过；科学保真不在 M01 范围** |
-| M02 | 元数据优先的 root 发现、依赖图与多入口 CLI | **代码及测试已提交，真实 Docker 自动入口 CI 待验收** |
+| M02 | 元数据优先的 root 发现、依赖图与多入口 CLI | **自编样本真实 Docker 自动入口与 Python 3.11/3.13 CI 已通过；大规模准确率待评测** |
 | M03 | 有界恢复和独立修复工作区 | 仅设计 |
 | M04 | Canonical PaperDocument 和交叉引用图 | 仅设计 |
 | M05 | 公式/引用/图表的质量门禁 | 仅设计 |
