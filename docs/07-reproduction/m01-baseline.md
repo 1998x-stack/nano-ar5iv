@@ -6,7 +6,7 @@
 
 - `nano-ar5iv inspect`: ingest an explicit local directory; reject symlinks, special files, private/cache entries and oversized trees; copy to a content-addressed source store; SHA256 each file; verify existing source snapshot hashes.
 - `nano-ar5iv convert`: require a **user-specified** relative `.tex/.ltx` entry; convert once through the pre-pulled `latexml/ar5ivist:2512.17` image; stage a separate writable copy; retain HTML, logs, stderr/stdout, exit state, command, inspected image ID and output checksums.
-- The Docker command constrains network (`--network=none`), capabilities (`--cap-drop=ALL`), rootfs (`--read-only`), privileges, non-root UID, PID/CPU/RAM/time limits and tmpfs. **Actual Docker security and compatibility have not been verified** in this environment. Never treat these flags alone as production sandbox approval.
+- The Docker command constrains network (`--network=none`), capabilities (`--cap-drop=ALL`), rootfs (`--read-only`), privileges, non-root UID, PID/CPU/RAM/time limits and tmpfs. **The minimal Docker conversion has now passed on a GitHub-hosted Linux runner; production sandbox security and broader platform compatibility remain unverified**. Never treat these flags alone as production sandbox approval.
 - Baseline diagnostic parser extracts Warning/Error/Fatal. A zero exit and HTML present show *process execution*, not scientific fidelity; Error/Fatal forces FAILED. Every run records `quality_status=NOT_EVALUATED`.
 
 ## Quick start
@@ -56,9 +56,9 @@ PYTHONPATH=src python -m compileall -q src tests
 PYTHONPATH=src python -m nano_ar5iv --output /tmp/nano-m01 inspect examples/trusted-minimal
 ~~~
 
-Result: **16 unittest cases, 15 pass, 1 skip** (`RUN_REAL_LATEXML` not configured); compileall passes; CLI inspect returns SHA256 bundle; CLI convert without Docker returns `ENGINE_UNAVAILABLE`, nonzero exit, and a run manifest. A fake engine integration test proves orchestration and artifact capture, **not a real LaTeXML conversion**. The optional test `RUN_REAL_LATEXML=1` should run only after the pinned image has been pulled and independently reviewed.
+Result: **16 unittest cases, 15 pass, 1 skip** (`RUN_REAL_LATEXML` not configured); compileall passes; CLI inspect returns SHA256 bundle; CLI convert without Docker returns `ENGINE_UNAVAILABLE`, nonzero exit, and a run manifest. A fake engine integration test proves orchestration and artifact capture, **not a real LaTeXML conversion**. The opt-in `RUN_REAL_LATEXML=1` test is now also executed in a separate GitHub CI Docker job; that real smoke test passed. Ordinary unit CI still intentionally skips it.
 
-Unverified: real Docker/ar5ivist conversion, real TeX→HTML/MathML, font/package compatibility, production hardening, benchmark throughput and scientific fidelity. All must remain `NOT_RUN` until actual evidence exists.
+Verified for one self-authored fixture: real Docker/ar5ivist invocation, generated HTML, full CLI artifact manifest and SHA256 checks. Not verified: scientific/math formula fidelity beyond simple output existence, broad macro/package/font compatibility, XML-specific pipeline, production security or performance. Those dimensions remain `NOT_RUN`.
 
 ## Known limitations and exit criteria
 
@@ -68,7 +68,7 @@ Unverified: real Docker/ar5ivist conversion, real TeX→HTML/MathML, font/packag
 4. Sandbox options are only planned defenses; test image behavior on Linux/macOS with controlled sample before using untrusted inputs.
 5. No PDF fallback, IR normalization, RAG, UI, job queue, durable replay or multi-tenant API.
 
-Next gate: verify one *real* Docker run with recorded image digest, XML/HTML/logs and source hashes; then implement M02 metadata-first entry discovery with actual fixtures.
+M01 baseline gate completed for a self-authored TeX sample, with recorded source and image IDs and generated HTML. XML-only stage output was not required by this ar5ivist HTML-mode test and remains outside this evidence. Next: M02 metadata-first entry discovery, dependency-graph fixtures, and broader real-source coverage.
 
 Related: [Reproduction blueprint](../04-architecture/reproduction-blueprint.md) · [Security](../05-quality/security.md) · [Experiment matrix](experiment-matrix.md).
 
