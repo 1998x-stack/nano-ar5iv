@@ -82,3 +82,34 @@ jobs:
           assert manifest["engine_attempt"]["exit_code"] == 0, manifest
           print("M02_REAL_DISCOVERY_PROBE_PASS", manifest["source_bundle_id"], attempt["status"])
           PY
+
+      - name: M03 real wrapper smoke (explicit fragment, auditable review)
+        shell: bash
+        run: |
+          set -euo pipefail
+          nano-ar5iv --output "$RUNNER_TEMP/nano-m03" recover-wrapper \
+            examples/trusted-fragment --fragment section.tex --documentclass article \
+            > "$RUNNER_TEMP/m03-plan.json"
+          nano-ar5iv --output "$RUNNER_TEMP/nano-m03" recover-wrapper \
+            examples/trusted-fragment --fragment section.tex --documentclass article \
+            --execute --timeout 180 > "$RUNNER_TEMP/m03-attempt.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"])
+          plan = json.loads((root / "m03-plan.json").read_text())
+          run = json.loads((root / "m03-attempt.json").read_text())
+          assert plan["status"] == "PLANNED_REVIEW_REQUIRED", plan
+          assert run["engine_status"] == "SUCCEEDED", run
+          assert run["status"] == "REVIEW_REQUIRED", run
+          assert run["quality_status"] == "NOT_EVALUATED", run
+          assert run["original_files_unchanged"] is True, run
+          assert run["attempt_count"] == 1, run
+          assert run["original_bundle_id"] != run["derived_bundle_id"], run
+          assert not (Path("examples/trusted-fragment") / "__nano_ar5iv_wrapper.tex").exists()
+          manifest = json.loads(Path(run["attempt_manifest_path"]).read_text())
+          assert manifest["root_entry"] == "__nano_ar5iv_wrapper.tex", manifest
+          assert manifest["quality_status"] == "NOT_EVALUATED", manifest
+          print("M03_REAL_WRAPPER_PASS", run["plan_id"], run["derived_bundle_id"])
+          PY

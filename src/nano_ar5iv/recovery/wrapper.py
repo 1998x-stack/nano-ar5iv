@@ -1,10 +1,13 @@
-"""ARCHITECTURE PLACEHOLDER: recovery/wrapper.py
+"""M03 deterministic wrapper text, using only explicit user-selected fragments."""
+from __future__ import annotations
 
-Planned responsibility: synthetic document wrapper proposal.
-Phase: M03.
-Input/output contracts: docs/04-architecture/module-catalog.md.
-Workflow design: docs/04-architecture/reproduction-blueprint.md.
 
-TODO: define interfaces, implement logic and add tests in the planned phase.
-Current runtime behavior: none. No converters or services are implemented.
-"""
+def render_wrapper(fragments: tuple[str, ...], documentclass: str) -> str:
+    # Never rewrite or infer any scientific content.
+    return (
+        "% nano-ar5iv generated wrapper; manual review required\n"
+        "\\documentclass{" + documentclass + "}\n"
+        "\\begin{document}\n"
+        + "".join("\\input{" + path + "}\n" for path in fragments)
+        + "\\end{document}\n"
+    )
