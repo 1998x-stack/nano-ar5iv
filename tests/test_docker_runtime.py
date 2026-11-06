@@ -30,6 +30,9 @@ class DockerRuntimeTests(unittest.TestCase):
         self.assertIn("--memory", args)
         self.assertIn("--source=paper.tex", args)
         self.assertIn("--destination=html/index.html", args)
+        mount = args[args.index("--mount") + 1]
+        self.assertTrue(mount.endswith(",dst=/docdir"), mount)
+        self.assertNotIn(",rw", mount)
 
     def test_rejects_latest_image(self):
         for image in ("latexml/ar5ivist:latest", "bad image", ""):

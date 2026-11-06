@@ -15,7 +15,10 @@ class RealLaTeXMLTests(unittest.TestCase):
             root = Path(d)
             (root / "paper.tex").write_text(tex)
             result = Ar5ivistEngine(DockerRuntime()).convert(root, "paper.tex", 180)
-            self.assertEqual(result.status, "SUCCEEDED")
+            details = {"attempt": result.to_dict(),
+                       "stderr": (root / "engine.stderr.txt").read_text(errors="replace") if (root / "engine.stderr.txt").exists() else "",
+                       "stdout": (root / "engine.stdout.txt").read_text(errors="replace") if (root / "engine.stdout.txt").exists() else ""}
+            self.assertEqual(result.status, "SUCCEEDED", str(details))
             self.assertTrue((root / "html" / "index.html").is_file())
 
 

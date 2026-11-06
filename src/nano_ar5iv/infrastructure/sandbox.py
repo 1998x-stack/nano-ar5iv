@@ -65,6 +65,7 @@ class DockerRuntime:
             raise ValueError("Isolated workspace must be an absolute directory")
         if not re.fullmatch(r"nano-ar5iv-[0-9a-f]{32}", container_name):
             raise ValueError("Invalid container name")
+        # Bind mounts are writable by default; Docker --mount rejects bare ,rw.
         return [
             self.docker_binary, "run", "--rm", "--pull=never", "--name", container_name,
             "--network=none", "--security-opt=no-new-privileges", "--cap-drop=ALL",
@@ -72,7 +73,7 @@ class DockerRuntime:
             "--cpus", self.cpus,
             "--tmpfs", "/tmp:rw,nosuid,nodev,size=256m",
             "--user", f"{os.getuid()}:{os.getgid()}",
-            "--mount", f"type=bind,src={workdir},dst=/docdir,rw", "--workdir", "/docdir",
+            "--mount", f"type=bind,src={workdir},dst=/docdir", "--workdir", "/docdir",
             self.image, f"--source={entry}", "--destination=html/index.html"
         ]
 
