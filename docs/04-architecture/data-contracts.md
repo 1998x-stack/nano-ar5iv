@@ -138,3 +138,9 @@
 每个输出独立保存 `paper-document.json` 与 `normalization-manifest.json`。来源 run artifact 需要通过 SHA256/大小核验；已有派生被篡改要明确失败。`source_ref` 未有可信原始 TeX 对齐时为 null，不能从 HTML 位置伪造。此代码使用 dataclass（并非已生成独立 JSON Schema），因此字段 JSON 表达通过 `to_dict()` 而不是声称完整 Schema 校验通过。
 
 正式说明：[M04 PaperDocument](../07-reproduction/m04-paper-document.md)。
+
+## M05.1 已实现 QualityReport（正式字段）
+
+`src/nano_ar5iv/ports/quality.py` 的 `QualityReport`, `Dimension`, `Finding` 为真实 dataclass，含 `schema_version=1.0`, `policy_version=m05.1`, `document_id`, `derivation_id`, `document_sha256`, `reference_sha256`, `dimensions`, `decision`, `reason_codes`, `provenance`。每个 dimension 独立为 `PASS|FAIL|UNKNOWN|NOT_RUN|NOT_APPLICABLE`，全局 decision 为 `ACCEPTED|PARTIAL|REVIEW_REQUIRED|REJECTED`；没有 PDF_FALLBACK 可运行实现。输出 `quality-reports/.../quality-report.json` 和哈希 manifest，**不改写 M04 PaperDocument 的原始 quality_status=NOT_EVALUATED**。
+
+`ACCEPTED` 仅覆盖用户提供且与 SourceBundle 绑定的黄金断言。人类 reviewer 字段不提供任何真实身份验证。详情：[M05 Quality Gate](../07-reproduction/m05-quality-gate.md)。

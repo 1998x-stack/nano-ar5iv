@@ -2,10 +2,10 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.6 M04 Canonical PaperDocument — M01–M03 已合并；M04 实现从已核验 LaTeXML XML / ar5ivist HTML 中生成版本化论文 IR、公式、表格、引用、来源和派生哈希。M04 的 Python 3.11/3.13 与真实 ar5ivist→PaperDocument CI 已通过；PDF-only fallback、M05–M07 未实现，科学保真度尚未验收。**  
+**项目状态：v0.7 M05.1 Evidence Quality Gate — M01–M04 已合并；M05.1 在 PR #11 中实现证据优先的独立质量报告、六个检查维度、人工黄金断言及 SHA-256 审计。M05.1 CI 验证中；视觉/PDF 比对、真实 arXiv 统计和 M06–M07 尚未实现。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
-> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线、M02 入口发现、M03 保守恢复，并新增 M04 的 PaperDocument 归一化；科学质量门禁、PDF-only fallback 和后台服务仍是占位。输出 HTML 不代表论文科学内容保真。
+> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线、M02 入口发现、M03 保守恢复，并新增 M04 的 PaperDocument 归一化；M05.1 初版质量门禁已编写代码；完整视觉/PDF 比对、PDF-only fallback 和后台服务仍为占位。输出 HTML 不代表论文科学内容保真。
 
 ## 目录
 
@@ -90,9 +90,9 @@ ar5iv/LaTeXML 让许多 LaTeX 论文拥有网页可读的 HTML5/MathML：它从*
 |---|---|---|
 | 技术原理与外部调研 | **已有文档** | [技术文档](docs/README.md)、[参考来源](docs/REFERENCES.md) |
 | README 与复现计划 | **已有设计** | 本文及 `docs/07-reproduction/` |
-| `src/nano_ar5iv` 代码层次 | **M01–M04 核心模块已实现** | snapshot、root 发现、受限恢复、XML/HTML→PaperDocument；M05+ 仍占位 |
+| `src/nano_ar5iv` 代码层次 | **M01–M05.1 主要模块已实现** | snapshot、root 发现、恢复、IR、证据质量门禁；M05 视觉与 M06+ 仍占位 |
 | `tests/`、`configs/`、`deployment/` | **已有单元测试** | 本地 15 通过/1 条条件跳过；GitHub CI 的独立真实 Docker/CLI 测试通过；configs/deployment 仍占位 |
-| LaTeXML 转换/源码恢复/质量检查 | **M01–M04 CLI 与归一化已实现** | 引擎、恢复、版本化结构提取；科学质量门禁/API 尚未实现 |
+| LaTeXML 转换/源码恢复/质量检查 | **M01–M05.1 CLI 已实现** | `evaluate` 可生成独立质量报告；尚未实现真实视觉/PDF 对照或生产级科学准确率认证 |
 | 官方上游手动转换演示 | **外部命令可参考** | 不等于本项目测试通过 |
 | Docker 镜像、部署、性能 | **调用参数已设计/实现** | 没有提供镜像，也未实际验证运行或完成安全审计 |
 
@@ -138,7 +138,7 @@ nano-ar5iv --output ./run-data convert ./examples/trusted-minimal --timeout 300
 
 输出包括 SourceBundle 哈希、显式 root、EngineAttempt、图像 ID、日志和 artifact manifest；所有结果仍标记 `quality_status=NOT_EVALUATED`。本地执行环境没有 Docker；GitHub-hosted runner 已完成**真实转换及正式 CLI 产物 SHA-256 验证**。证据：[GitHub Actions M01 real CLI verification](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42189149532)。完整操作步骤与测试证据见 [M01 Baseline](docs/07-reproduction/m01-baseline.md)。
 
-**M02 已实现**：`discover`、省略 `--entry` 自动转换唯一入口、`--all-roots`、可选 `discover --probe --top-k 2`。歧义与无效清单会拒绝自动选择。仍未实现 `evaluate`、`replay`、`.tar.gz` 归档输入和科学内容质量门禁；除 M03 两条显式启用的有限策略外，不会进行源码修复。详见 [M02 入口自动发现](docs/07-reproduction/m02-entry-discovery.md)。
+**M02 已实现**：`discover`、省略 `--entry` 自动转换唯一入口、`--all-roots`、可选 `discover --probe --top-k 2`。歧义与无效清单会拒绝自动选择。`evaluate` 已在 M05.1 实现有限证据门禁；仍未实现 `replay`、`.tar.gz` 归档输入、独立 PDF 视觉校验等；除 M03 两条显式启用的有限策略外，不会进行源码修复。详见 [M02 入口自动发现](docs/07-reproduction/m02-entry-discovery.md)。
 
 ### M03：保守式源码恢复（需要显式授权）
 
@@ -170,6 +170,21 @@ nano-ar5iv --output ./run-data normalize \
 ~~~
 
 M04 从有 SHA256 证据的 XML（优先）或 HTML（回退）提取层级节点、公式 TeX/MathML、表格单元格、图像引用及文献连边，保存到独立 `normalizations/<run_id>/<derivation_id>/paper-document.json`。原始 `sources/` 和 `runs/` 不更改。HTML 回退为有损来源，不能伪造 LaTeX 源码行号；`quality_status` **仍为 NOT_EVALUATED**。完整说明见 [M04 PaperDocument](docs/07-reproduction/m04-paper-document.md)。
+
+### M05.1：基于原始证据的质量评估（可执行）
+
+~~~bash
+# 直接对已生成的 M04 paper-document.json 评估：默认绝不声称科学保真通过
+nano-ar5iv --output ./run-data evaluate \
+  ./run-data/normalizations/<run_id>/<derivation_id>/paper-document.json
+
+# 由调用者独立提供、与 SourceBundle SHA256 绑定的人工审校黄金断言
+nano-ar5iv --output ./run-data evaluate \
+  ./run-data/normalizations/<run_id>/<derivation_id>/paper-document.json \
+  --golden ./independently-reviewed-golden.json
+~~~
+
+返回 `quality-reports/<run_id>/<derivation_id>/<report_id>/quality-report.json`，逐项记录结构、数学、引用、资产、视觉和来源的状态。**没有黄金基准不能自动 `ACCEPTED`**；HTML 有损回退、来源不明、未执行的视觉测试也不能视为通过。`ACCEPTED` 仅表示用户提交的全部适用黄金断言通过，**并不等于论文所有科学事实已经认证**。详见 [M05 Quality Gate](docs/07-reproduction/m05-quality-gate.md)。
 
 ## 五、九大代码 Category 与仓库结构
 
@@ -269,6 +284,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | 宏包/源码损坏如何修复 | [recovery playbook](docs/02-source-recovery/recovery-playbook.md) |
 | 官方资料、论文与社区评论 | [landscape](docs/03-research/landscape.md) / [issues](docs/03-research/issue-analysis.md) |
 | 总架构 | [system architecture](docs/04-architecture/system-architecture.md) |
+| **M05 证据质量门禁与可审计报告** | [M05 Quality Gate](docs/07-reproduction/m05-quality-gate.md) |
 | **M04 结构化论文 IR 与来源审计** | [M04 PaperDocument](docs/07-reproduction/m04-paper-document.md) |
 | **M03 可审计修复与一次重试** | [M03 Conservative Recovery](docs/07-reproduction/m03-conservative-recovery.md) |
 | **M02 主文件自动发现、依赖图与测试** | [M02 entry discovery](docs/07-reproduction/m02-entry-discovery.md) |
@@ -295,7 +311,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | M02 | 元数据优先的 root 发现、依赖图与多入口 CLI | **自编样本真实 Docker 自动入口与 Python 3.11/3.13 CI 已通过；大规模准确率待评测** |
 | M03 | 显式片段包装、结束标记补全、错误归类和不可变修复审计 | **已合并 main，真实最小转换验收通过** |
 | M04 | 原生 XML / HTML→PaperDocument、公式/表格/引用、稳定 ID 和派生校验 | **M04.1 PR #10 已通过真实 Docker/MathML 与 Python 3.11/3.13 CI；PDF-only fallback 未实现** |
-| M05 | 公式/引用/图表的质量门禁 | 仅设计 |
+| M05 | 公式/引用/图表/来源验证 + 人工 golden + 独立质量报告 | **M05.1 PR #11 代码已提交；真实视觉/PDF 和统计校准待实现** |
 | M06 | 队列、缓存、API、UI、部署 | 仅设计 |
 | M07 | 可选、受控 LLM 辅助和科研 RAG | 仅设计 |
 
