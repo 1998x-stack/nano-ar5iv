@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import replace
 from typing import Any
 from nano_ar5iv.domain.documents import (
-    Asset, Citation, DocumentNode, Equation, PaperDocument, UnknownNode,
+    Asset, Citation, DocumentNode, Equation, PaperDocument, TableCell, UnknownNode,
 )
 from nano_ar5iv.normalization.assets import classify_asset_href
 from nano_ar5iv.normalization.citation_graph import build_relations
@@ -133,10 +133,32 @@ def _is_figure(el: ET.Element, fmt: str) -> bool:
 
 
 def _is_table(el: ET.Element, fmt: str) -> bool:
+    name = localname(el.tag).lower()
     if fmt == "xml":
-        return localname(el.tag) == "table"
-    return _classed(el, "ltx_table") or (localname(el.tag).lower() == "table" and
-           not _classed(el, "ltx_tabular"))
+        return name in {"table", "tabular"}
+    return name == "table" or _classed(el, "ltx_table") or _classed(el, "ltx_tabular")
+
+
+def _table_rows(el: ET.Element) -> tuple[tuple[TableCell, ...], ...]:
+    result = []
+    for row in el.iter():
+        if localname(row.tag).lower() != "tr":
+            continue
+        cells = []
+        for cell in row:
+            if localname(cell.tag).lower() not in {"td", "th"}:
+                continue
+            def bounded_span(value: str | None) -> int:
+                try:
+                    amount = int(value or 1)
+                    return amount if 1 <= amount <= 1000 else 1
+                except (TypeError, ValueError):
+                    return 1
+            cells.append(TableCell(_text(cell), bounded_span(cell.get("colspan")),
+                                   bounded_span(cell.get("rowspan")), _source_id(cell)))
+        if cells:
+            result.append(tuple(cells))
+    return tuple(result)
 
 
 def _is_image(el: ET.Element, fmt: str) -> bool:
@@ -200,8 +222,8 @@ def normalize_element_tree(root: ET.Element, *, bundle_id: str, root_path: str,
     seen_ids: set[str] = set()
 
     def walk(el: ET.Element, path: tuple[int, ...], current_parent: str | None,
-             figure_context: bool, math_context: bool, cite_context: bool,
-             depth: int) -> None:
+             figure_context: bool, table_context: bool, math_context: bool,
+             cite_context: bool, depth: int) -> None:
         nonlocal count
         count += 1
         if count > MAX_ELEMENTS or depth > MAX_DEPTH:
@@ -228,13 +250,15 @@ def normalize_element_tree(root: ET.Element, *, bundle_id: str, root_path: str,
         figure = _is_figure(el, input_format)
         table = _is_table(el, input_format)
         image = _is_image(el, input_format)
-        if figure or table or (image and not figure_context):
+        if (figure and not figure_context) or (table and not table_context) or (
+                image and not figure_context and not table_context):
             kind = "figure" if figure else ("table" if table else "image")
             aid = _identifier(seed, "asset", path, raw_id)
             href = _asset_href(el) if kind != "table" else None
             availability = classify_asset_href(href) if kind != "table" else "NOT_APPLICABLE"
-            document.assets.append(Asset(aid, kind, href, _caption(el), owner,
-                                         raw_id, availability))
+            document.assets.append(Asset(
+                aid, kind, href, _caption(el), owner, raw_id, availability,
+                _table_rows(el) if kind == "table" else ()))
             if raw_id and raw_id not in id_index:
                 id_index[raw_id] = aid
         is_math = name == "Math" if input_format == "xml" else name.lower() == "math"
@@ -262,12 +286,14 @@ def normalize_element_tree(root: ET.Element, *, bundle_id: str, root_path: str,
             if truncated:
                 document.warnings.append("UNKNOWN_MARKUP_TRUNCATED")
         next_figure = figure_context or figure
+        next_table = table_context or table
         next_math = math_context or is_math
         next_cite = cite_context or name.lower() == "cite" or _classed(el, "ltx_cite")
         for index, child in enumerate(el):
-            walk(child, path + (index,), owner, next_figure, next_math, next_cite, depth + 1)
+            walk(child, path + (index,), owner, next_figure, next_table,
+                 next_math, next_cite, depth + 1)
 
-    walk(root, (), None, False, False, False, 0)
+    walk(root, (), None, False, False, False, False, 0)
     document.nodes = [replace(n, children=tuple(parent_children.get(n.id, ())))
                       for n in document.nodes]
     document.relations = build_relations(document.citations, id_index)

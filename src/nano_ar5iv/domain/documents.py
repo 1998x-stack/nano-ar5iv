@@ -35,6 +35,14 @@ class Equation:
 
 
 @dataclass(frozen=True, slots=True)
+class TableCell:
+    text: str
+    colspan: int = 1
+    rowspan: int = 1
+    source_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Asset:
     id: str
     kind: str
@@ -43,6 +51,7 @@ class Asset:
     parent_id: str | None = None
     source_id: str | None = None
     availability: str = "NOT_CHECKED"
+    table_rows: tuple[tuple[TableCell, ...], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
