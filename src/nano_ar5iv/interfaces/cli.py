@@ -17,11 +17,12 @@ from nano_ar5iv.infrastructure.sandbox import DockerRuntime
 from nano_ar5iv.application.recover import recover_existing_root, recover_fragments
 from nano_ar5iv.recovery.strategies import RecoveryPolicy
 from nano_ar5iv.recovery.wrapper import plan_wrapper
+from nano_ar5iv.application.normalize import normalize_run
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="nano-ar5iv",
-                                     description="M02: inspect source, discover TeX roots, convert trusted sources")
+                                     description="M01-M04: source/entry discovery, conversion, bounded recovery, PaperDocument normalization")
     parser.add_argument("--output", required=True, type=Path,
                         help="snapshot and artifact directory (must be outside input)")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -57,9 +58,29 @@ def main(argv: list[str] | None = None) -> int:
     recovery.add_argument("--image", default="latexml/ar5ivist:2512.17")
     recovery.add_argument("--timeout", type=int, default=300)
 
+    normalize = sub.add_parser("normalize", help="derive a versioned PaperDocument from an existing run")
+    normalize.add_argument("run_manifest", type=Path)
+    normalize.add_argument("--format", choices=("auto", "xml", "html"), default="auto",
+                           help="prefer a verified native XML artifact; fall back to HTML")
+
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
+        if args.cmd == "normalize":
+            document, path = normalize_run(args.run_manifest, output, args.format)
+            print(json.dumps({
+                "status": "NORMALIZED", "document_id": document.document_id,
+                "document_path": str(path), "source_kind": document.source_kind,
+                "schema_version": document.schema_version,
+                "quality_status": document.quality_status,
+                "counts": {
+                    "nodes": len(document.nodes), "equations": len(document.equations),
+                    "assets": len(document.assets), "citations": len(document.citations),
+                    "unresolved_relations": sum(1 for x in document.relations if x.resolution != "RESOLVED"),
+                    "unknown_nodes": len(document.unknown_nodes),
+                },
+            }, ensure_ascii=False, indent=2))
+            return 0
         bundle = ingest_source(args.source, SnapshotStore(output))
         if args.cmd == "inspect":
             print(json.dumps({**bundle.to_dict(), "manifest_path": str(bundle.manifest_path)},

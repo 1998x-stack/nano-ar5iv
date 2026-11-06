@@ -1,6 +1,6 @@
-# 逐文件实施顺序与 PR 切片（M01 部分实现，其余仍为计划）
+# 逐文件实施顺序与 PR 切片（M01–M04 分阶段实现，M05+ 仍为计划）
 
-本表保留最初的 M01–M07 开发计划。M01 已实现第一批真实源码、单元/模拟集成测试与 CLI；真实 LaTeXML 容器转换仍待验收，M02–M07 绝大多数文件尚为占位。实际证据见 [M01 baseline](m01-baseline.md)。
+本表保留最初的 M01–M07 计划及切片验收。M01–M03 已实现并合并，**M04.1 已实现 XML/HTML 归一化和 CLI（PR #10）**，但 PDF-only fallback/完整 TeX source spans 尚未交付，M05–M07 仍是规划。证据见 [M01 baseline](m01-baseline.md)、[M02 entry](m02-entry-discovery.md)、[M03 recovery](m03-conservative-recovery.md)、[M04 IR](m04-paper-document.md)。
 
 ## Slice M01.1 — 核心契约与可信源快照
 
@@ -42,10 +42,10 @@
 - `infrastructure/workspaces.py`、`application/recover.py`；
 - **验收**：copy-on-write、修复 diff、有限重试、数学公式不能被静默替换；R01–R10。
 
-## Slice M04 — Canonical IR
+## Slice M04 — Canonical IR（M04.1 已有实现；PDF-only fallback 后续）
 
 - `domain/documents.py`、`normalization/xml_to_ir.py`、`html_to_ir.py`、`citation_graph.py`、`assets.py`；
-- `adapters/pdf/extraction.py`（fallback 单独 provenance）；
+- `adapters/pdf/extraction.py`（PDF fallback **未实现**，必须区别于 XML/HTML 的已实现能力）；
 - **验收**：节点 ID 稳定、citation edges 保持、未知节点不会丢弃、版本化 schema。
 
 ## Slice M05 — 可信质量门禁

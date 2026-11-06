@@ -1,4 +1,4 @@
-name: Python M01/M02/M03 tests
+name: Python M01-M04 tests
 
 on:
   pull_request:
@@ -66,6 +66,11 @@ jobs:
         env:
           RUN_REAL_LATEXML: "1"
         run: python -m unittest discover -s tests -p 'test_real_m03_opt_in.py' -v
+
+      - name: Real M04 ar5ivist HTML to canonical PaperDocument
+        env:
+          RUN_REAL_LATEXML: "1"
+        run: python -m unittest discover -s tests -p 'test_real_m04_opt_in.py' -v
 
       - name: Run complete M01 CLI and check checksums
         shell: bash

@@ -1,6 +1,6 @@
-# 09｜代码 Category 与实际占位目录（Architecture Scaffold + M01/M02/M03 v0.5）
+# 09｜代码 Category 与实际占位目录（Architecture Scaffold + M01–M04 v0.6）
 
-> **更新于 2026-11-06：本文件中的模块和目录已创建，**M01/M02 的源码快照、Docker 转换、入口发现、依赖图及 M03 的保守修复和 CLI 均已有代码；后续 M04–M07 仍为 docstring/TODO 占位**；M01/M02 已通过真实 ar5ivist 转换，M03 正在验证；科学质量门禁及 API 服务尚未实现。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
+> **更新于 2026-11-06：本文件中的模块和目录已创建，**M01/M02 的源码快照、Docker 转换、入口发现、依赖图及 M03 的保守修复和 CLI 均已有代码；M04 PaperDocument/归一化已实现，后续 M05–M07 仍为占位**；M01/M02 已通过真实 ar5ivist 转换，M03 已通过真实转换回归；科学质量门禁及 API 服务尚未实现。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
 
 ## 1. 代码分层原则
 
@@ -26,7 +26,7 @@ source, recovery, normalization, quality: pure policies/transforms whenever poss
 nano-ar5iv/
 ├── README.md
 ├── CONTRIBUTING.md
-├── pyproject.toml                    # 仅打包元数据：0.0.0，无 CLI、无运行依赖
+├── pyproject.toml                    # Python packaging + 已有 CLI
 ├── .gitignore
 ├── docs/
 │   ├── 01-foundations/              # LaTeXML、MathML 与 ar5iv 技术
@@ -116,7 +116,7 @@ Python package 保留 __init__.py，占位目录由 .gitkeep 保存；**M01 已�
 | 03 source | 发现/依赖/入口选择 | source bundle → EntryDecision/DocumentSet | M02 |
 | 04 recovery | 根因归类、策略和副本修复 | diagnostic → RecoveryPlan + immutable patch | M03 |
 | 05 adapters | 所有外部解析/转换执行 | workspace → XML/HTML/log/asset | M01/M04 |
-| 06 normalization | 中间表示到标准科学文档 | XML/HTML/PDF → PaperDocument | M04 |
+| 06 normalization | 中间表示到标准科学文档 | XML/HTML → PaperDocument（PDF-only 待后续） | M04 |
 | 07 quality | 结构/科学保真/视觉校验 | IR + evidence → QualityReport | M05 |
 | 08 infrastructure | 沙箱/缓存/存储/任务安全 | job → isolated attempts/artifacts | M01/M06 |
 | 09 interfaces | CLI/API/报告交付 | external request → application use case | M06 |
@@ -152,4 +152,4 @@ ingest→source inventory→manifest→dependency graph→root selection
 
 ## 6. 实现切片和改动纪律
 
-详见 [implementation-slices.md](../07-reproduction/implementation-slices.md)。以 §M01→M02→M03→M04→M05→M06§ 推进，每一阶段需要固定工具版本、授权 fixture、测试和回归报告。M01–M03 已有实际功能和回归测试，M04–M07 未实现。
+详见 [implementation-slices.md](../07-reproduction/implementation-slices.md)。以 §M01→M02→M03→M04→M05→M06§ 推进，每一阶段需要固定工具版本、授权 fixture、测试和回归报告。M01–M04 已有实际功能及回归测试，M05–M07 尚未实现；PDF-only fallback 未实现。

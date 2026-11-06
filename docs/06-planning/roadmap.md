@@ -1,4 +1,4 @@
-# 15｜分阶段交付路线图（M01/M02 基线验收完成、M03 有界恢复验证中）
+# 15｜分阶段交付路线图（M01–M03 已验收，M04.1 已通过 CI）
 
 ## M00 — Documentation & Evidence（本 PR 目标）
 
@@ -18,7 +18,7 @@
 
 ## M04 — Canonical PaperDocument
 
-计划：从 XML/HTML 规范化章节、公式、图表、文献、交叉引用，维护 source spans 与 provenance；支持 PDF fallback 的单独来源。**验收**：schema/版本回归、稳定节点 ID、引用完整性。
+**M04.1 实现（PR #10）**：LaTeXML XML→IR、ar5ivist HTML 回退、PaperDocument schema 1.0、公式 source_tex / MathML（可空）、图/表/单元格跨度、citation/ref 连边、未知科学结构、结构稳定 ID、来源工件 SHA256、幂等派生目录和 `normalize` CLI；**真实 Docker 贯通与 Python 3.11/3.13 回归已通过**（[GitHub Actions #42204716397](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42204716397)）。**剩余**：PDF-only fallback（M04.2）、完整原文 source spans、真实论文长尾语料覆盖率、科学保真质量门禁（M05）。[M04 guide](../07-reproduction/m04-paper-document.md)。
 
 ## M05 — Quality Gate & Golden Dataset
 
