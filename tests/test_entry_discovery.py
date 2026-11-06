@@ -9,6 +9,7 @@ import zipfile
 from pathlib import Path
 
 from nano_ar5iv.application.discover import discover_entries
+from nano_ar5iv.source.archive import extract_archive
 from nano_ar5iv.infrastructure.repositories import SnapshotStore, UnsafeSource
 from nano_ar5iv.interfaces.cli import main
 
@@ -157,6 +158,16 @@ class EntryDiscoveryTests(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(main(["--output", str(self.base / "out"), "discover", str(archive)]), 2)
         self.assertFalse((self.base / "escape.tex").exists())
+
+    def test_zip_directory_header_flood_rejected(self):
+        archive = self.base / "header-flood.zip"
+        with zipfile.ZipFile(archive, "w") as zf:
+            for i in range(4):
+                zf.writestr("directory-" + str(i) + "/", "")
+        extraction = self.base / "extract"
+        extraction.mkdir()
+        with self.assertRaises(UnsafeSource):
+            extract_archive(archive, extraction, max_files=1)
 
     def test_tar_symlink_rejected(self):
         archive = self.base / "bad.tar"

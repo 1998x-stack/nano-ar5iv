@@ -32,6 +32,8 @@ def extract_archive(archive: Path, destination: Path, max_files: int = 500,
         raise UnsafeSource("Archive must be a regular file without symlinks")
     if not dest.is_dir() or any(dest.iterdir()):
         raise UnsafeSource("Archive destination must exist and be empty")
+    if source.stat().st_size > max_bytes * 2:
+        raise UnsafeSource("Archive exceeds compressed-input budget")
     total = 0
     count = 0
     used: set[str] = set()
@@ -57,7 +59,10 @@ def extract_archive(archive: Path, destination: Path, max_files: int = 500,
 
     if zipfile.is_zipfile(source):
         with zipfile.ZipFile(source) as zf:
-            for item in zf.infolist():
+            headers = zf.infolist()
+            if len(headers) > max_files * 3:
+                raise UnsafeSource("Too many ZIP headers")
+            for item in headers:
                 name = _name(item.filename.rstrip("/") if item.is_dir() else item.filename)
                 kind = (item.external_attr >> 16) & 0o170000
                 if kind not in (0, stat.S_IFDIR if item.is_dir() else stat.S_IFREG):
@@ -70,7 +75,11 @@ def extract_archive(archive: Path, destination: Path, max_files: int = 500,
                     emit(name, item.file_size, stream)
     elif tarfile.is_tarfile(source):
         with tarfile.open(source, mode="r:*") as tf:
+            headers_seen = 0
             for item in tf:
+                headers_seen += 1
+                if headers_seen > max_files * 3:
+                    raise UnsafeSource("Too many TAR headers")
                 if item.isdir():
                     _name(item.name.rstrip("/"))
                     continue

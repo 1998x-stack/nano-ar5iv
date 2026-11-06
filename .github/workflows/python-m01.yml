@@ -56,3 +56,29 @@ jobs:
         env:
           RUN_REAL_LATEXML: "1"
         run: python -m unittest discover -s tests -p 'test_real_latexml_opt_in.py' -v
+
+      - name: M02 actual entry discovery and bounded Docker probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          nano-ar5iv --output "$RUNNER_TEMP/nano-m02" discover examples/trusted-minimal > "$RUNNER_TEMP/m02-discover.json"
+          nano-ar5iv --output "$RUNNER_TEMP/nano-m02" probe examples/trusted-minimal --top-k 1 --timeout 180 > "$RUNNER_TEMP/m02-probe.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          temp = Path(os.environ["RUNNER_TEMP"])
+          discovered = json.loads((temp / "m02-discover.json").read_text())
+          probed = json.loads((temp / "m02-probe.json").read_text())
+          assert discovered["status"] == "SELECTED", discovered
+          assert discovered["selected_roots"] == ["manuscript.tex"], discovered
+          assert probed["quality_status"] == "NOT_EVALUATED", probed
+          assert probed["auto_selected"] is False, probed
+          assert len(probed["attempts"]) == 1, probed
+          attempt = probed["attempts"][0]
+          assert attempt["entry"] == "manuscript.tex" and attempt["status"] == "SUCCEEDED", attempt
+          manifest = json.loads(Path(attempt["manifest_path"]).read_text())
+          assert manifest["quality_status"] == "NOT_EVALUATED", manifest
+          assert manifest["engine_attempt"]["exit_code"] == 0, manifest
+          print("M02_REAL_DISCOVERY_PROBE_PASS", manifest["source_bundle_id"], attempt["status"])
+          PY
