@@ -18,9 +18,18 @@ def evaluate_assets(document: PaperDocument, reference: Golden | None,
     figures = [a for a in document.assets if a.kind in {"figure", "image"}]
     tables = [a for a in document.assets if a.kind == "table"]
     for item in figures:
-        if item.availability in {"UNSAFE_PATH", "UNSAFE_OR_INLINE", "MISSING_REFERENCE"}:
-            errors.append(Finding("UNSAFE_OR_MISSING_ASSET",
-                                  "Figure has unsafe or absent asset link", item.id, item.href))
+        if item.availability == "UNSAFE_PATH" or (
+                item.availability == "UNSAFE_OR_INLINE"
+                and not (item.href or "").startswith("data:")):
+            errors.append(Finding("UNSAFE_ASSET_URI",
+                                  "Figure has an unsafe local/active resource URI",
+                                  item.id, item.href))
+        elif item.availability == "MISSING_REFERENCE" or (
+                item.availability == "UNSAFE_OR_INLINE"
+                and (item.href or "").startswith("data:")):
+            uncertain.append(Finding("INLINE_OR_UNMAPPED_FIGURE",
+                                     "Inline SVG/data image or missing URI cannot be hash-verified",
+                                     item.id, item.href))
         elif item.availability == "EXTERNAL_UNFETCHED":
             uncertain.append(Finding("EXTERNAL_FIGURE_UNCHECKED",
                                      "Remote figure not downloaded or compared", item.id))

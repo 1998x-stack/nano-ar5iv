@@ -174,7 +174,16 @@ class M05GateTests(unittest.TestCase):
         doc.assets.append(Asset("f1","figure","../private.png",availability="UNSAFE_PATH"))
         result = assess(doc, expected=False)
         self.assertEqual(result.decision, "REJECTED")
-        self.assertIn("UNSAFE_OR_MISSING_ASSET", result.reason_codes)
+        self.assertIn("UNSAFE_ASSET_URI", result.reason_codes)
+
+    def test_inline_svg_without_file_uri_is_unknown_not_unsafe(self):
+        from nano_ar5iv.domain.documents import Asset
+        doc = source_document()
+        doc.assets.append(Asset("inline-svg", "image", None, availability="MISSING_REFERENCE"))
+        result = assess(doc, expected=False)
+        self.assertNotEqual(result.decision, "REJECTED")
+        self.assertEqual(result.dimensions["assets"].status, "UNKNOWN")
+        self.assertIn("INLINE_OR_UNMAPPED_FIGURE", result.reason_codes)
 
     def test_unsupported_golden_fields_and_no_review_provenance(self):
         data = golden_data()
