@@ -1,6 +1,6 @@
-# M00-B/M01｜模块清单：部分 M01 已实现，其他模块仍是占位
+# M00-B/M01–M03｜模块清单：前三阶段部分实现，后续仍是占位
 
-本页保留 M00 模块职责的最初规划，**现在 M01 部分模块已经实现**，具体能力和差异见 [M01 baseline](../07-reproduction/m01-baseline.md)。未实现的其他 .py 仍只有 docstring/TODO。规划中尚未实现的实体（如 PaperDocument）不应被视为实际 API。
+本页保留 M00 模块职责的最初规划，**现在 M01–M03 的部分模块已经实现**，具体能力和差异见 [M01 baseline](../07-reproduction/m01-baseline.md)。M03 的 recovery 类目及应用编排已由占位升级为真实保守修复代码，未实现的其他 .py 仍只有 docstring/TODO。详见 [M03](../07-reproduction/m03-conservative-recovery.md)。规划中尚未实现的实体（如 PaperDocument）不应被视为实际 API。
 
 ## Category 1：domain（不引用外层）
 

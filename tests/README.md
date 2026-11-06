@@ -25,3 +25,12 @@ GitHub Actions 独立真实 Docker job 已通过最小 LaTeXML 转换、完整 C
 ### M02 CI 验收
 - [GitHub Actions #42198296310](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42198296310)：Python 3.11/3.13 共 38 unittest/每个版本，36 通过、2 按普通矩阵跳过；独立真实 Docker 作业运行原 M01 与新增 M02 自动入口用例，全部通过。
 - 验证范围仅为自编最小论文、静态依赖及模拟引擎；不代表真实 arXiv 大型语料的入口定位准确率和科学保真合格。
+
+### M03 tests
+
+- `tests/test_m03_recovery.py` checks source immutability, one retry, first-cause diagnostics, SHA256 validation and forged patch rejection.
+- `tests/test_m03_cli.py` checks `recover --entry/--fragments/--plan-only`, status and audit manifests.
+- `tests/test_real_m03_opt_in.py` runs a self-authored fragment-wrapper conversion in the pre-pulled ar5ivist Docker image (separate CI real-engine job).
+- Results must be tied to the successful PR CI run. A fake engine only validates orchestration; HTML existence is not M05 scientific fidelity evidence.
+
+See [M03 recovery](../docs/07-reproduction/m03-conservative-recovery.md).

@@ -2,10 +2,10 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.4 M02 Entrypoint Discovery — M01 真实 ar5ivist 基线已验证；M02 新增 arXiv 元数据、依赖图、自动选择/多入口与显式歧义诊断。M02 自动入口真实 Docker 集成、Python 3.11/3.13 CI 均已通过；M03–M07 尚未实现，科学保真尚未验收。**  
+**项目状态：v0.5 M03 Conservative Recovery — M01/M02 已通过真实基线转换测试；M03 新增显式启用的保守恢复、一次受限重试、独立修复副本和哈希审计。M03 正在 PR #8 验证，M04–M07 尚未实现，科学保真度尚未验收。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
-> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线和 M02 入口发现；恢复、PaperDocument、科学质量门禁及后台服务仍是占位。输出 HTML 不代表论文科学内容保真。
+> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线、M02 入口发现和 M03 两项保守恢复策略；PaperDocument、科学质量门禁及后台服务仍是占位。输出 HTML 不代表论文科学内容保真。
 
 ## 目录
 
@@ -90,9 +90,9 @@ ar5iv/LaTeXML 让许多 LaTeX 论文拥有网页可读的 HTML5/MathML：它从*
 |---|---|---|
 | 技术原理与外部调研 | **已有文档** | [技术文档](docs/README.md)、[参考来源](docs/REFERENCES.md) |
 | README 与复现计划 | **已有设计** | 本文及 `docs/07-reproduction/` |
-| `src/nano_ar5iv` 代码层次 | **M01/M02 已实现** | snapshot、元数据/依赖图、自动入口与 Docker baseline；其余模块仍为占位 |
+| `src/nano_ar5iv` 代码层次 | **M01–M03 核心功能已实现** | snapshot、入口与依赖图、显式包装入口/补全结束标记和 Docker 基线；后续模块仍为占位 |
 | `tests/`、`configs/`、`deployment/` | **已有单元测试** | 本地 15 通过/1 条条件跳过；GitHub CI 的独立真实 Docker/CLI 测试通过；configs/deployment 仍占位 |
-| LaTeXML 转换/源码恢复/质量检查 | **M01/M02 CLI + 引擎适配已实现** | 已有真实 LaTeXML M01 验收；M02 支持自动选根，恢复/质量判断/API 尚未实现 |
+| LaTeXML 转换/源码恢复/质量检查 | **M01–M03 CLI + 引擎适配已实现** | M01/M02 真实转换已验收；M03 仅保守恢复，科学质量门禁/API 尚未实现 |
 | 官方上游手动转换演示 | **外部命令可参考** | 不等于本项目测试通过 |
 | Docker 镜像、部署、性能 | **调用参数已设计/实现** | 没有提供镜像，也未实际验证运行或完成安全审计 |
 
@@ -138,7 +138,24 @@ nano-ar5iv --output ./run-data convert ./examples/trusted-minimal --timeout 300
 
 输出包括 SourceBundle 哈希、显式 root、EngineAttempt、图像 ID、日志和 artifact manifest；所有结果仍标记 `quality_status=NOT_EVALUATED`。本地执行环境没有 Docker；GitHub-hosted runner 已完成**真实转换及正式 CLI 产物 SHA-256 验证**。证据：[GitHub Actions M01 real CLI verification](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42189149532)。完整操作步骤与测试证据见 [M01 Baseline](docs/07-reproduction/m01-baseline.md)。
 
-**M02 已实现**：`discover`、省略 `--entry` 自动转换唯一入口、`--all-roots`、可选 `discover --probe --top-k 2`。歧义与无效清单会拒绝自动选择。仍未实现 `evaluate`、`replay`、`.tar.gz` 输入、源码修复和科学内容质量门禁。详见 [M02 入口自动发现](docs/07-reproduction/m02-entry-discovery.md)。
+**M02 已实现**：`discover`、省略 `--entry` 自动转换唯一入口、`--all-roots`、可选 `discover --probe --top-k 2`。歧义与无效清单会拒绝自动选择。仍未实现 `evaluate`、`replay`、`.tar.gz` 归档输入和科学内容质量门禁；除 M03 两条显式启用的有限策略外，不会进行源码修复。详见 [M02 入口自动发现](docs/07-reproduction/m02-entry-discovery.md)。
+
+### M03：保守式源码恢复（需要显式授权）
+
+~~~bash
+# 先只预览包装方案，无须 Docker
+nano-ar5iv --output ./run-data recover ./examples/trusted-fragments \
+  --fragments intro.tex method.tex --plan-only
+
+# 可信本地 TeX：生成临时入口，调用预先拉取的 Docker 镜像
+nano-ar5iv --output ./run-data recover ./examples/trusted-fragments \
+  --fragments intro.tex method.tex --document-class article
+
+# 主文件已知但缺失结束标记：先跑原始转换，失败后才可能限额修复
+nano-ar5iv --output ./run-data recover ./paper --entry manuscript.tex
+~~~
+
+**M03 仅允许**追加缺失 `\end{document}`（需要日志与源码证据）或按明确顺序生成片段包装入口；不自动修补自定义宏包、公式或参考文献。所有成功恢复输出仍是 `RECOVERED_UNVERIFIED / quality_status=NOT_EVALUATED`。详见 [M03 Recovery](docs/07-reproduction/m03-conservative-recovery.md)。
 
 ## 五、九大代码 Category 与仓库结构
 
@@ -238,6 +255,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | 宏包/源码损坏如何修复 | [recovery playbook](docs/02-source-recovery/recovery-playbook.md) |
 | 官方资料、论文与社区评论 | [landscape](docs/03-research/landscape.md) / [issues](docs/03-research/issue-analysis.md) |
 | 总架构 | [system architecture](docs/04-architecture/system-architecture.md) |
+| **M03 可审计修复与一次重试** | [M03 Conservative Recovery](docs/07-reproduction/m03-conservative-recovery.md) |
 | **M02 主文件自动发现、依赖图与测试** | [M02 entry discovery](docs/07-reproduction/m02-entry-discovery.md) |
 | **M01 实现与测试证据** | [M01 baseline](docs/07-reproduction/m01-baseline.md) |
 | **端到端函数级复现蓝图** | [reproduction blueprint](docs/04-architecture/reproduction-blueprint.md) |
@@ -260,7 +278,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | M00 | 技术研究、代码体系和真实占位结构 | 已提交 PR #2、尚待合并 |
 | M01 | 源码快照、CLI、固定镜像适配、provenance | **M01 基线与真实 Docker/CLI 端到端验收通过；科学保真不在 M01 范围** |
 | M02 | 元数据优先的 root 发现、依赖图与多入口 CLI | **自编样本真实 Docker 自动入口与 Python 3.11/3.13 CI 已通过；大规模准确率待评测** |
-| M03 | 有界恢复和独立修复工作区 | 仅设计 |
+| M03 | 显式片段包装、结束标记补全、错误归类和不可变修复审计 | **代码和测试已提交 PR #8，科学保真仍待 M05** |
 | M04 | Canonical PaperDocument 和交叉引用图 | 仅设计 |
 | M05 | 公式/引用/图表的质量门禁 | 仅设计 |
 | M06 | 队列、缓存、API、UI、部署 | 仅设计 |
