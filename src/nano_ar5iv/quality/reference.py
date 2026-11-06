@@ -105,7 +105,7 @@ def parse_golden(raw: bytes) -> Golden:
     _object_list(expected["bibliography"], "bibliography", {"source_id", "text"}, {"source_id", "text"})
     _object_list(expected["figures"], "figures", {"href", "sha256"}, {"href", "sha256"})
     _object_list(expected["tables"], "tables", {"rows"}, {"rows"})
-    if expected["visual"] not in {"REQUIRED", "NOT_APPLICABLE"}:
+    if not isinstance(expected["visual"], str) or expected["visual"] not in {"REQUIRED", "NOT_APPLICABLE"}:
         raise InvalidGolden("Visual review must be REQUIRED or NOT_APPLICABLE")
     if any(x["kind"] not in {"citation", "reference"} for x in expected["citations"]):
         raise InvalidGolden("Unknown citation kind")

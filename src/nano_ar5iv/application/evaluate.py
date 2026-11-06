@@ -62,7 +62,7 @@ def _document(data: dict) -> PaperDocument:
             unknown_nodes=unknowns, warnings=data["warnings"],
             quality_status=data["quality_status"], schema_version=data["schema_version"],
             normalizer_version=data["normalizer_version"])
-        if doc.to_dict() != data:
+        if stable_json(doc.to_dict()) != stable_json(data):
             raise InvalidEvidence("Unexpected/unsupported IR fields")
         if (not isinstance(doc.document_id, str) or
                 not isinstance(doc.provenance, dict) or not isinstance(doc.engine, dict)):
@@ -119,6 +119,29 @@ def _load_evidence(document_path: Path, output_root: Path) -> tuple[
         raise InvalidEvidence("Missing valid source bundle ID")
     if document.engine.get("status") != run.get("engine_attempt", {}).get("status"):
         raise InvalidEvidence("Engine status differs from original conversion")
+    # Revalidate the M01 immutable source snapshot, not just its metadata reference.
+    bundle_id = document.provenance["source_bundle_id"]
+    snapshot_root = output / "sources" / bundle_id
+    snapshot, _ = _safe_json(snapshot_root / "manifest.json", 2 * 1024 * 1024)
+    if snapshot.get("bundle_id") != bundle_id:
+        raise InvalidEvidence("Source snapshot bundle identity mismatch")
+    file_records = snapshot.get("files", [])
+    if not isinstance(file_records, list) or len(file_records) > 500:
+        raise InvalidEvidence("Invalid source inventory")
+    for record in file_records:
+        if not isinstance(record, dict):
+            raise InvalidEvidence("Invalid source inventory item")
+        filename = record.get("path")
+        digest = record.get("sha256")
+        if not _safe_relpath(filename) or not _SHA.fullmatch(str(digest or "")):
+            raise InvalidEvidence("Unsafe source inventory path")
+        source_file = snapshot_root / "files" / filename
+        if (source_file.is_symlink() or
+                not source_file.resolve(strict=False).is_relative_to((snapshot_root / "files").resolve()) or
+                not source_file.is_file() or source_file.stat().st_size != record.get("size_bytes") or
+                sha256_file(source_file) != digest):
+            raise InvalidEvidence("Immutable source snapshot has changed")
+
     recorded = {x.get("path"): x for x in run.get("artifacts", []) if isinstance(x, dict)}
     input_ref = document.provenance.get("input_artifact")
     if not _safe_relpath(input_ref) or input_ref not in recorded:
