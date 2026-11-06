@@ -2,10 +2,10 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.5 M03 Conservative Recovery — M01/M02 已通过真实基线转换测试；M03 新增显式启用的保守恢复、一次受限重试、独立修复副本和哈希审计。M03 正在 PR #8 验证，M04–M07 尚未实现，科学保真度尚未验收。**  
+**项目状态：v0.6 M04 Canonical PaperDocument — M01–M03 已合并；M04 实现从已核验 LaTeXML XML / ar5ivist HTML 中生成版本化论文 IR、公式、表格、引用、来源和派生哈希。M04 正在 PR #10 验证；PDF-only fallback、M05–M07 未实现，科学保真度尚未验收。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
-> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线、M02 入口发现和 M03 两项保守恢复策略；PaperDocument、科学质量门禁及后台服务仍是占位。输出 HTML 不代表论文科学内容保真。
+> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线、M02 入口发现、M03 保守恢复，并新增 M04 的 PaperDocument 归一化；科学质量门禁、PDF-only fallback 和后台服务仍是占位。输出 HTML 不代表论文科学内容保真。
 
 ## 目录
 
@@ -90,9 +90,9 @@ ar5iv/LaTeXML 让许多 LaTeX 论文拥有网页可读的 HTML5/MathML：它从*
 |---|---|---|
 | 技术原理与外部调研 | **已有文档** | [技术文档](docs/README.md)、[参考来源](docs/REFERENCES.md) |
 | README 与复现计划 | **已有设计** | 本文及 `docs/07-reproduction/` |
-| `src/nano_ar5iv` 代码层次 | **M01–M03 核心功能已实现** | snapshot、入口与依赖图、显式包装入口/补全结束标记和 Docker 基线；后续模块仍为占位 |
+| `src/nano_ar5iv` 代码层次 | **M01–M04 核心模块已实现** | snapshot、root 发现、受限恢复、XML/HTML→PaperDocument；M05+ 仍占位 |
 | `tests/`、`configs/`、`deployment/` | **已有单元测试** | 本地 15 通过/1 条条件跳过；GitHub CI 的独立真实 Docker/CLI 测试通过；configs/deployment 仍占位 |
-| LaTeXML 转换/源码恢复/质量检查 | **M01–M03 CLI + 引擎适配已实现** | M01/M02 真实转换已验收；M03 仅保守恢复，科学质量门禁/API 尚未实现 |
+| LaTeXML 转换/源码恢复/质量检查 | **M01–M04 CLI 与归一化已实现** | 引擎、恢复、版本化结构提取；科学质量门禁/API 尚未实现 |
 | 官方上游手动转换演示 | **外部命令可参考** | 不等于本项目测试通过 |
 | Docker 镜像、部署、性能 | **调用参数已设计/实现** | 没有提供镜像，也未实际验证运行或完成安全审计 |
 
@@ -156,6 +156,20 @@ nano-ar5iv --output ./run-data recover ./paper --entry manuscript.tex
 ~~~
 
 **M03 仅允许**追加缺失 `\end{document}`（需要日志与源码证据）或按明确顺序生成片段包装入口；不自动修补自定义宏包、公式或参考文献。所有成功恢复输出仍是 `RECOVERED_UNVERIFIED / quality_status=NOT_EVALUATED`。详见 [M03 Recovery](docs/07-reproduction/m03-conservative-recovery.md)。
+
+### M04：从真实转换 run 生成结构化 PaperDocument
+
+~~~bash
+# 先对可信本地论文完成转换并保留 manifest_path
+nano-ar5iv --output ./run-data convert ./examples/trusted-minimal \
+  --entry manuscript.tex > ./convert-result.json
+
+# 从返回 JSON 中取得 manifest_path，然后无需 Docker 进行归一化
+nano-ar5iv --output ./run-data normalize \
+  ./run-data/runs/<run-id>/manifest.json --format auto
+~~~
+
+M04 从有 SHA256 证据的 XML（优先）或 HTML（回退）提取层级节点、公式 TeX/MathML、表格单元格、图像引用及文献连边，保存到独立 `normalizations/<run_id>/<derivation_id>/paper-document.json`。原始 `sources/` 和 `runs/` 不更改。HTML 回退为有损来源，不能伪造 LaTeX 源码行号；`quality_status` **仍为 NOT_EVALUATED**。完整说明见 [M04 PaperDocument](docs/07-reproduction/m04-paper-document.md)。
 
 ## 五、九大代码 Category 与仓库结构
 
@@ -255,6 +269,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | 宏包/源码损坏如何修复 | [recovery playbook](docs/02-source-recovery/recovery-playbook.md) |
 | 官方资料、论文与社区评论 | [landscape](docs/03-research/landscape.md) / [issues](docs/03-research/issue-analysis.md) |
 | 总架构 | [system architecture](docs/04-architecture/system-architecture.md) |
+| **M04 结构化论文 IR 与来源审计** | [M04 PaperDocument](docs/07-reproduction/m04-paper-document.md) |
 | **M03 可审计修复与一次重试** | [M03 Conservative Recovery](docs/07-reproduction/m03-conservative-recovery.md) |
 | **M02 主文件自动发现、依赖图与测试** | [M02 entry discovery](docs/07-reproduction/m02-entry-discovery.md) |
 | **M01 实现与测试证据** | [M01 baseline](docs/07-reproduction/m01-baseline.md) |
@@ -278,8 +293,8 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | M00 | 技术研究、代码体系和真实占位结构 | 已提交 PR #2、尚待合并 |
 | M01 | 源码快照、CLI、固定镜像适配、provenance | **M01 基线与真实 Docker/CLI 端到端验收通过；科学保真不在 M01 范围** |
 | M02 | 元数据优先的 root 发现、依赖图与多入口 CLI | **自编样本真实 Docker 自动入口与 Python 3.11/3.13 CI 已通过；大规模准确率待评测** |
-| M03 | 显式片段包装、结束标记补全、错误归类和不可变修复审计 | **代码和测试已提交 PR #8，科学保真仍待 M05** |
-| M04 | Canonical PaperDocument 和交叉引用图 | 仅设计 |
+| M03 | 显式片段包装、结束标记补全、错误归类和不可变修复审计 | **已合并 main，真实最小转换验收通过** |
+| M04 | 原生 XML / HTML→PaperDocument、公式/表格/引用、稳定 ID 和派生校验 | **M04.1 PR #10 已实现，自动化测试验收中；PDF-only fallback 未实现** |
 | M05 | 公式/引用/图表的质量门禁 | 仅设计 |
 | M06 | 队列、缓存、API、UI、部署 | 仅设计 |
 | M07 | 可选、受控 LLM 辅助和科研 RAG | 仅设计 |

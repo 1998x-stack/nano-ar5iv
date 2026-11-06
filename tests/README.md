@@ -34,3 +34,13 @@ GitHub Actions 独立真实 Docker job 已通过最小 LaTeXML 转换、完整 C
 - Results must be tied to the successful PR CI run. A fake engine only validates orchestration; HTML existence is not M05 scientific fidelity evidence.
 
 See [M03 recovery](../docs/07-reproduction/m03-conservative-recovery.md).
+
+### M04 Python tests and real-engine integration
+
+- `test_m04_normalization.py` — XML and HTML semantic extraction, formulas, tables, bibliographic refs, unknown structures, DTD/bounds, invalid/external assets.
+- `test_m04_run_integration.py` — source/manifest SHA256, immutable normalization store, idempotence, tamper refusal, CLI and XML preference.
+- `test_real_m04_opt_in.py` — **real GitHub-hosted Docker/ar5ivist** minimal self-authored conversion followed by `normalize` and PaperDocument hash/MathML checks.
+- Python 3.11/3.13 suites run via the normal matrix; Docker test only runs with `RUN_REAL_LATEXML=1` in the dedicated CI job. Refer to PR #10 for the current acceptance state.
+- No scientific claim quality gate, arbitrary PDF conversion or large real arXiv benchmark in this stage.
+
+[M04 guide](../docs/07-reproduction/m04-paper-document.md).

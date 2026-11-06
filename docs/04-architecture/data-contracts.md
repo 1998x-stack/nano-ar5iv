@@ -1,6 +1,6 @@
-# 10｜数据契约与事件设计（Proposal v0.1）
+# 10｜数据契约与事件设计（早期 Proposal + M04 已实现 IR）
 
-本页为未来 JSON Schema / Pydantic / dataclass 的**语义约定**。以下 JSON 示例合法，但**尚未实现、未执行 Schema 校验**。
+本页早期样例属于 M00 研究提案，**不要将 schema_version 0.1 或示例字段当作当前运行时 API**。M01–M03 的源码/转换数据契约已经演进，**M04 版本化 PaperDocument dataclass schema 1.0 已实际实现**。真实字段、校验、M04 运行演示请查 [M04 guide](../07-reproduction/m04-paper-document.md)，而非依赖下面的旧草图。
 
 ## SourceBundle
 
@@ -121,3 +121,20 @@
 - `ArtifactStore.put_immutable(data) -> content_addressed_uri`
 
 以上是未来接口签名草图，不是现成 Python 函数。
+
+## M04.1 已实现的数据契约（schema_version 1.0）
+
+真实 Python 类型位于 `src/nano_ar5iv/domain/documents.py`，有 `PaperDocument.to_dict()`。重要字段：
+
+- `document_id / root_path / source_kind (latex_xml|latex_html)`；
+- `engine / provenance`，含 `run_id / source_bundle_id / source_run_manifest_sha256 / input_artifact / input_sha256 / source_span_status`；
+- `nodes[]`：`id/kind/parent_id/title/text/source_id/source_ref/children[]`；
+- `equations[]`：`id/source_tex/presentation_mathml/parent_id/source_id/source_ref/verified=false`；
+- `assets[]`：`id/kind/href/caption/parent_id/source_id/availability/table_rows[][]`；
+- `citations[]` 与 `relations[]`：原始目标、映射后的 target ID、RESOLVED/UNRESOLVED；
+- `unknown_nodes[] / warnings[]`：异常语义结构与有损回退证据；
+- `quality_status=NOT_EVALUATED`；M05 质量认证尚不存在。
+
+每个输出独立保存 `paper-document.json` 与 `normalization-manifest.json`。来源 run artifact 需要通过 SHA256/大小核验；已有派生被篡改要明确失败。`source_ref` 未有可信原始 TeX 对齐时为 null，不能从 HTML 位置伪造。此代码使用 dataclass（并非已生成独立 JSON Schema），因此字段 JSON 表达通过 `to_dict()` 而不是声称完整 Schema 校验通过。
+
+正式说明：[M04 PaperDocument](../07-reproduction/m04-paper-document.md)。

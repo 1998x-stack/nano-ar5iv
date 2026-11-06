@@ -1,13 +1,13 @@
-# M00-B/M01–M03｜模块清单：前三阶段部分实现，后续仍是占位
+# M00-B/M01–M04｜模块清单：四阶段部分实现，后续 M05–M07 占位
 
-本页保留 M00 模块职责的最初规划，**现在 M01–M03 的部分模块已经实现**，具体能力和差异见 [M01 baseline](../07-reproduction/m01-baseline.md)。M03 的 recovery 类目及应用编排已由占位升级为真实保守修复代码，未实现的其他 .py 仍只有 docstring/TODO。详见 [M03](../07-reproduction/m03-conservative-recovery.md)。规划中尚未实现的实体（如 PaperDocument）不应被视为实际 API。
+本页保留 M00 模块职责的最初规划，**现在 M01–M04 的核心模块已经实现**，具体能力和差异见 [M01 baseline](../07-reproduction/m01-baseline.md)。M03 的 recovery 类目及应用编排已由占位升级为真实保守修复代码，未实现的其他 .py 仍只有 docstring/TODO。详见 [M03](../07-reproduction/m03-conservative-recovery.md)。M04 已有真实 `PaperDocument`、`DocumentNode`、`Equation`、`TableCell`、`Asset`、`Citation`、`Relation` 类型，后续 QualityReport 与批量 API 仍是规划。详见 [M04](../07-reproduction/m04-paper-document.md)。
 
 ## Category 1：domain（不引用外层）
 
 | File | 未来重要实体 / 函数 | 约束 |
 |---|---|---|
 | `domain/source.py` | `SourceBundle`、`SourceFile`、`EntryCandidate`、`EntryDecision`、`DocumentSet` | 相对路径、不可变输入、来源哈希 |
-| `domain/documents.py` | `PaperDocument`、`DocumentNode`、`Equation`、`Figure`、`Table`、`Citation` | 来源明确、ID 稳定 |
+| `domain/documents.py` | `PaperDocument`、`DocumentNode`、`Equation`、`Asset`、`TableCell`、`Citation`、`Relation` | 来源明确、ID 稳定 |
 | `domain/diagnostics.py` | `DiagnosticEvent`、`Severity`、`FailureFamily` | 可区分 conversion engine/source fault |
 | `domain/provenance.py` | `SourceSpan`、`ArtifactDigest`、`RepairDiff` | 来源可追溯 |
 | `domain/states.py` | `JobState`、`ConversionStatus`、`QualityDecision` | 显式合法状态跃迁 |
