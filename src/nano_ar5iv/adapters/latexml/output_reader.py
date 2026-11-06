@@ -33,8 +33,13 @@ def load_run_artifact(run_manifest: Path, output_root: Path,
                       format: str = "auto", max_bytes: int = 20 * 1024 * 1024) -> NormalizationInput:
     if format not in {"auto", "xml", "html"}:
         raise InvalidArtifact("format must be auto/xml/html")
-    base = Path(output_root).resolve(strict=True)
-    path = Path(run_manifest).resolve(strict=True)
+    base = Path(output_root).resolve()
+    if not base.is_dir():
+        raise InvalidArtifact("Configured output root does not exist")
+    try:
+        path = Path(run_manifest).resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise InvalidArtifact("Conversion run manifest is unavailable") from exc
     if not path.is_relative_to(base / "runs") or path.name != "manifest.json":
         raise InvalidArtifact("Run manifest must be inside configured output/runs")
     raw = path.read_bytes()

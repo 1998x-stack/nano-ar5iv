@@ -55,7 +55,7 @@ def _source_id(el: ET.Element) -> str | None:
 
 def _title(el: ET.Element) -> str | None:
     for child in el:
-        if localname(child.tag) == "title":
+        if localname(child.tag).lower() == "title" or _classed(child, "ltx_title"):
             value = _text(child)
             return value or None
     return None

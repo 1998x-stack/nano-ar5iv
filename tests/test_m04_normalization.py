@@ -110,7 +110,7 @@ class NormalizationTests(unittest.TestCase):
     def test_html_section_math_and_citation_edges(self):
         d = self.normalize_html()
         self.assertEqual(d.source_kind, "latex_html")
-        self.assertTrue(any(n.kind == "section" for n in d.nodes))
+        self.assertTrue(any(n.kind == "section" and n.title == "Introduction" for n in d.nodes))
         self.assertEqual(len(d.equations), 2)
         self.assertIsNone(d.equations[0].source_tex)
         self.assertIn("HTML_DOM_RECONSTRUCTED", d.warnings[0])
