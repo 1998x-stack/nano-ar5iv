@@ -1,6 +1,6 @@
-# 09｜代码 Category 与实际占位目录（Architecture Scaffold + M01 v0.3）
+# 09｜代码 Category 与实际占位目录（Architecture Scaffold + M01/M02 v0.4）
 
-> **更新于 2026-11-06：本文件中的模块和目录已创建，**部分 M01 Python 文件已实现真实源码快照、Docker 转换适配和 CLI，其余仍为 docstring/TODO 占位**；尚未跑通真实 LaTeXML 或实现质量/恢复/API 服务。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
+> **更新于 2026-11-06：本文件中的模块和目录已创建，**M01/M02 的源码快照、Docker 转换、入口发现、依赖图及 CLI 已实现，后续 M03–M07 仍为 docstring/TODO 占位**；尚未跑通真实 LaTeXML 或实现质量/恢复/API 服务。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
 
 ## 1. 代码分层原则
 

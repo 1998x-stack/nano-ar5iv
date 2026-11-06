@@ -1,4 +1,4 @@
-name: Python M01 unit tests
+name: Python M01/M02 tests
 
 on:
   pull_request:
@@ -56,6 +56,11 @@ jobs:
         env:
           RUN_REAL_LATEXML: "1"
         run: python -m unittest discover -s tests -p 'test_real_latexml_opt_in.py' -v
+
+      - name: Real M02 metadata-driven auto-entry conversion
+        env:
+          RUN_REAL_LATEXML: "1"
+        run: python -m unittest discover -s tests -p 'test_real_m02_opt_in.py' -v
 
       - name: Run complete M01 CLI and check checksums
         shell: bash
