@@ -41,7 +41,7 @@ class FailureTriageTests(unittest.TestCase):
         result = classify_failure("", status="SUCCEEDED", exit_code=0)
         self.assertEqual(result["category"], "NO_ERROR_OBSERVED")
         self.assertFalse(result["root_cause_proven"])
-        self.assertFalse(result["review_required"])
+        self.assertTrue(result["review_required"])
 
     def test_nonzero_exit_without_log(self):
         self.assertEqual(classify_failure("", status="FAILED", exit_code=125)["category"], "PROCESS_FAILED")
