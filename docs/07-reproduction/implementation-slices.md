@@ -1,6 +1,6 @@
-# 逐文件实施顺序与 PR 切片（M01 部分实现，其余仍为计划）
+# 逐文件实施顺序与 PR 切片（M01/M02 及 M03 部分实现）
 
-本表保留最初的 M01–M07 开发计划。M01 已实现第一批真实源码、单元/模拟集成测试与 CLI；真实 LaTeXML 容器转换仍待验收，M02–M07 绝大多数文件尚为占位。实际证据见 [M01 baseline](m01-baseline.md)。
+本表保留最初的 M01–M07 开发计划。M01 已通过可信自编样本真实转换冒烟，M02 已通过自动入口发现与实际探测；M03 本批实现日志分类、显式生成包装入口与 copy-on-write 单次执行。完整恢复策略尚未实现。证据见 [M01 baseline](m01-baseline.md)、[M02 discovery](m02-entry-discovery.md)、[M03 recovery](m03-recovery.md)。
 
 ## Slice M01.1 — 核心契约与可信源快照
 
@@ -31,12 +31,12 @@
 - `application/discover.py`、`tests/unit/` / `integration/`：E08–E12；
 - **验收**：多 root 保序，动态 input 返回 unknown，不把 comments/verbatim 当依赖。
 
-## Slice M03.1 — 诊断分类
+## Slice M03.1 — 诊断分类（仅启发式归类已实现）
 
 - `domain/diagnostics.py`、`recovery/classifier.py`、`adapters/latexml/diagnostics.py`；
 - **验收**：root cause 与 cascade 分层、错误码溯源、缺失宏包/超时覆盖。
 
-## Slice M03.2 — 受限修复与状态机
+## Slice M03.2 — 受限修复与状态机（显式包装与一次性执行已实现）
 
 - `recovery/strategies.py`、`wrapper.py`、`patch_policy.py`、`planner.py`；
 - `infrastructure/workspaces.py`、`application/recover.py`；

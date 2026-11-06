@@ -8,6 +8,9 @@ import tempfile
 from pathlib import Path
 from nano_ar5iv.application.discover import discover_entries
 from nano_ar5iv.application.probe import probe_candidates
+from nano_ar5iv.application.recover import save_plan, execute_wrapper
+from nano_ar5iv.recovery.planner import create_wrapper_plan
+from nano_ar5iv.recovery.classifier import classify_failure
 from nano_ar5iv.source.archive import extract_archive
 from nano_ar5iv.application.convert import convert_source
 from nano_ar5iv.application.ingest import ingest_source
@@ -17,9 +20,21 @@ from nano_ar5iv.infrastructure.sandbox import DockerRuntime
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="nano-ar5iv", description="M02: source snapshots, discovery, Docker baseline")
+    parser = argparse.ArgumentParser(prog="nano-ar5iv", description="M03: auditable snapshots, discovery and explicit conservative recovery")
     parser.add_argument("--output", required=True, type=Path, help="snapshot and run artifact directory outside input")
     sub = parser.add_subparsers(dest="cmd", required=True)
+    diagnose = sub.add_parser("diagnose", help="heuristic log root-cause triage, no patch")
+    diagnose.add_argument("logfile", type=Path)
+    diagnose.add_argument("--status", default="FAILED")
+    diagnose.add_argument("--exit-code", type=int)
+    diagnose.add_argument("--timed-out", action="store_true")
+    recover = sub.add_parser("recover-wrapper", help="explicit synthetic wrapper; preview unless --execute")
+    recover.add_argument("source", type=Path)
+    recover.add_argument("--fragment", action="append", required=True, dest="fragments")
+    recover.add_argument("--documentclass", required=True)
+    recover.add_argument("--execute", action="store_true", help="one trusted Docker attempt, remains review-required")
+    recover.add_argument("--image", default="latexml/ar5ivist:2512.17")
+    recover.add_argument("--timeout", type=int, default=180)
     inspect = sub.add_parser("inspect", help="hash and snapshot a directory or ZIP/TAR archive")
     inspect.add_argument("source", type=Path)
     discover = sub.add_parser("discover", help="metadata-first entry discovery (no conversion)")
@@ -37,6 +52,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
+        if args.cmd == "diagnose":
+            if args.logfile.is_symlink() or not args.logfile.is_file() or args.logfile.stat().st_size > 2_000_000:
+                raise ValueError("Expected a regular log file at most 2 MiB")
+            log = args.logfile.read_text(encoding="utf-8", errors="replace")
+            print(json.dumps(classify_failure(log, status=args.status, exit_code=args.exit_code,
+                                              timed_out=args.timed_out), ensure_ascii=False, indent=2))
+            return 0
         with tempfile.TemporaryDirectory(prefix="nano-ar5iv-archive-") as staging:
             input_path = args.source
             if input_path.is_file():
@@ -45,6 +67,18 @@ def main(argv: list[str] | None = None) -> int:
                 extract_archive(input_path, extracted)
                 input_path = extracted
             bundle = ingest_source(input_path, SnapshotStore(output))
+        if args.cmd == "recover-wrapper":
+            plan = create_wrapper_plan(bundle, tuple(args.fragments), args.documentclass)
+            plan_path = save_plan(plan, output)
+            if not args.execute:
+                print(json.dumps({"status": "PLANNED_REVIEW_REQUIRED", "plan_path": str(plan_path),
+                                  "plan": plan.to_dict(), "quality_status": "NOT_EVALUATED"},
+                                 ensure_ascii=False, indent=2))
+                return 0
+            engine = Ar5ivistEngine(DockerRuntime(image=args.image))
+            report, report_path = execute_wrapper(bundle, plan, engine, output, args.timeout)
+            print(json.dumps({"report_path": str(report_path), **report}, ensure_ascii=False, indent=2))
+            return 0 if report["engine_status"] == "SUCCEEDED" else 2
         if args.cmd == "inspect":
             print(json.dumps({**bundle.to_dict(), "manifest_path": str(bundle.manifest_path)}, ensure_ascii=False, indent=2))
             return 0
