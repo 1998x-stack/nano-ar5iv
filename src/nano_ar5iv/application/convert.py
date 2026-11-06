@@ -9,6 +9,9 @@ from nano_ar5iv.domain.source import SourceBundle
 from nano_ar5iv.infrastructure.repositories import ArtifactStore
 from nano_ar5iv.infrastructure.workspaces import attempt_workspace
 from nano_ar5iv.ports.engines import ConversionEngine, EngineAttempt
+from nano_ar5iv.recovery.strategies import RecoveryPlan, APPEND_END, WRAPPER
+from nano_ar5iv.recovery.patch_policy import apply_plan
+from nano_ar5iv.domain.provenance import stable_json
 
 
 class InvalidEntry(ValueError):
@@ -28,10 +31,19 @@ def validate_entry(bundle: SourceBundle, entry: str) -> str:
 
 def convert_source(bundle: SourceBundle, entry: str, engine: ConversionEngine,
                    store: ArtifactStore, timeout_seconds: int = 300,
-                   selection: dict | None = None) -> tuple[EngineAttempt, Path]:
-    entry = validate_entry(bundle, entry)
+                   selection: dict | None = None,
+                   repair_plan: RecoveryPlan | None = None,
+                   parent_run: str | None = None) -> tuple[EngineAttempt, Path]:
+    if repair_plan is None or repair_plan.strategy == APPEND_END:
+        entry = validate_entry(bundle, entry)
+    elif repair_plan.strategy == WRAPPER:
+        if entry != repair_plan.entry or entry in {f.path for f in bundle.files}:
+            raise InvalidEntry("Synthetic wrapper must have a new reserved entry")
+    else:
+        raise InvalidEntry("Unknown recovery strategy")
     run_id = uuid.uuid4().hex
     with attempt_workspace(bundle) as workspace:
+        patch_evidence = apply_plan(workspace, bundle, repair_plan) if repair_plan else None
         attempt = engine.convert(workspace, entry, timeout_seconds)
         with tempfile.TemporaryDirectory(prefix="nano-ar5iv-artifacts-") as tmp:
             artifact_dir = Path(tmp)
@@ -48,10 +60,17 @@ def convert_source(bundle: SourceBundle, entry: str, engine: ConversionEngine,
             html = workspace / "html"
             if html.is_dir():
                 shutil.copytree(html, artifact_dir / "html", symlinks=True)
+            if patch_evidence:
+                (artifact_dir / "repair.diff").write_text(patch_evidence.diff, encoding="utf-8")
+                (artifact_dir / "repair-audit.json").write_bytes(stable_json({
+                    "plan": repair_plan.public_dict(), "evidence": patch_evidence.to_dict(),
+                    "parent_run": parent_run}))
             manifest = {"schema_version": "1.0", "run_id": run_id,
                         "source_bundle_id": bundle.bundle_id, "root_entry": entry,
                         "engine_attempt": attempt.to_dict(),
                         "quality_status": "NOT_EVALUATED",
                         "source_manifest": str(bundle.manifest_path),
-                        "entry_selection": selection or {"method": "explicit", "entry": entry}}
+                        "entry_selection": selection or {"method": "explicit", "entry": entry},
+                        "repair_audit": patch_evidence.to_dict() if patch_evidence else None,
+                        "parent_run": parent_run}
             return attempt, store.write_run(run_id, manifest, artifact_dir)

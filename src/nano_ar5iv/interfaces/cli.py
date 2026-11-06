@@ -14,6 +14,9 @@ from nano_ar5iv.application.ingest import ingest_source
 from nano_ar5iv.adapters.latexml.runner import Ar5ivistEngine
 from nano_ar5iv.infrastructure.repositories import ArtifactStore, SnapshotStore, UnsafeSource
 from nano_ar5iv.infrastructure.sandbox import DockerRuntime
+from nano_ar5iv.application.recover import recover_existing_root, recover_fragments
+from nano_ar5iv.recovery.strategies import RecoveryPolicy
+from nano_ar5iv.recovery.wrapper import plan_wrapper
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -40,6 +43,20 @@ def main(argv: list[str] | None = None) -> int:
                          help="convert each discovered top-level file separately (never merge)")
     convert.add_argument("--image", default="latexml/ar5ivist:2512.17")
     convert.add_argument("--timeout", type=int, default=300)
+
+    recovery = sub.add_parser("recover", help="OPT-IN conservative patch recovery, trusted local TeX only")
+    recovery.add_argument("source", type=Path)
+    mode = recovery.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--entry", help="existing TeX root; one baseline then at most one safe patch")
+    mode.add_argument("--fragments", nargs="+", help="explicitly ordered incomplete .tex/.ltx fragments")
+    recovery.add_argument("--document-class", default="article", choices=("article", "report", "book"))
+    recovery.add_argument("--preamble", help="optional explicit macro fragment used before begin{document}")
+    recovery.add_argument("--plan-only", action="store_true",
+                          help="only preview an explicit-fragment wrapper; no Docker")
+    recovery.add_argument("--max-repairs", type=int, default=1, choices=(0, 1))
+    recovery.add_argument("--image", default="latexml/ar5ivist:2512.17")
+    recovery.add_argument("--timeout", type=int, default=300)
+
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
@@ -57,6 +74,30 @@ def main(argv: list[str] | None = None) -> int:
                                             ArtifactStore(output), args.top_k, args.timeout)
             print(json.dumps(decision.to_dict(), ensure_ascii=False, indent=2))
             return 0 if decision.status in {"SELECTED", "MULTIPLE_ROOTS"} else 3
+
+        if args.cmd == "recover":
+            if args.plan_only:
+                if not args.fragments:
+                    raise ValueError("--plan-only is supported only with explicitly ordered --fragments")
+                plan = plan_wrapper(bundle, tuple(args.fragments), args.document_class, args.preamble)
+                print(json.dumps({"status": "PLAN_ONLY", "plan": plan.public_dict(),
+                                  "quality_status": "NOT_EVALUATED"},
+                                 ensure_ascii=False, indent=2))
+                return 0
+            engine = Ar5ivistEngine(DockerRuntime(image=args.image))
+            store = ArtifactStore(output)
+            if args.entry:
+                if args.preamble is not None or args.document_class != "article":
+                    raise ValueError("Class/preamble options apply only to explicit fragments")
+                result = recover_existing_root(bundle, args.entry, engine, store, args.timeout,
+                                               RecoveryPolicy(max_repairs=args.max_repairs))
+            else:
+                if args.max_repairs == 0:
+                    raise ValueError("Explicit fragment wrapper requires max-repairs=1")
+                result = recover_fragments(bundle, tuple(args.fragments), engine, store,
+                                           args.document_class, args.preamble, args.timeout)
+            print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+            return 0 if result.status in {"BASELINE_SUCCEEDED", "RECOVERED_UNVERIFIED"} else 3
 
         if args.entry and args.all_roots:
             raise ValueError("Use --entry OR --all-roots, not both")
