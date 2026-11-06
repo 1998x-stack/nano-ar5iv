@@ -27,6 +27,11 @@
 - [M02 Entry Discovery 实现、CLI 与验收](07-reproduction/m02-entry-discovery.md)：arXiv 元数据主入口、静态依赖图、明确歧义状态、optional top-k trial、真实 Docker 测试。
 - 旧 M00 的架构设计和 M01 的基线说明依然保留，M03–M07 文档属于规划，不代表已经实现。
 
+## M03 保守恢复功能
+
+- [M03 保守式源码恢复、操作方法和审计契约](07-reproduction/m03-conservative-recovery.md)：失败基线后的有限结束标记补全、明确有序片段包装、沙箱副本、SHA256 以及拒绝不可信补丁。
+- M03 的 `RECOVERED_UNVERIFIED` 不代表数学或科学内容正确；M04/M05 尚未实现。
+
 ## 文档约定
 
 - 使用 `[F]` 表示核实的外部事实、`[O]` 表示外部报告/意见、`[D]` 表示本项目设计决策、`[H]` 表示待验证假设。
