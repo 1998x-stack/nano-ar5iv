@@ -44,3 +44,5 @@ See [M03 recovery](../docs/07-reproduction/m03-conservative-recovery.md).
 - No scientific claim quality gate, arbitrary PDF conversion or large real arXiv benchmark in this stage.
 
 [M04 guide](../docs/07-reproduction/m04-paper-document.md).
+
+M04 验收：GitHub Actions [#42204716397](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42204716397) 三组 CI success；Python 3.11/3.13 各 76 test（72 pass，4 skipped），独立 Docker M01–M04 转换链路成功。结果仅适用于测试覆盖与自编最小 TeX，**不等于已完成科学内容质量验收**。

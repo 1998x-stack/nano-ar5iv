@@ -1,6 +1,6 @@
 # M04｜Canonical PaperDocument：从 LaTeXML XML / ar5ivist HTML 到结构化论文
 
-> **实现：M04.1，PR #10（2026-11-06）**。本阶段交付版本化科学文档 IR、XML 原生语义解析、HTML 回退、引用关系与表格模型、来源与完整性审计。**未实现科学保真质量认证、通用 PDF 提取或 RAG 服务**。输出始终为 `quality_status=NOT_EVALUATED`。
+> **实现：M04.1，PR #10（2026-11-06）；真实 Docker+Python CI 已通过**。本阶段交付版本化科学文档 IR、XML 原生语义解析、HTML 回退、引用关系与表格模型、来源与完整性审计。**未实现科学保真质量认证、通用 PDF 提取或 RAG 服务**。输出始终为 `quality_status=NOT_EVALUATED`。
 
 ## 1. 为什么需要 Canonical IR
 
@@ -158,6 +158,13 @@ run-data/
 `tests/test_m04_run_integration.py`：模拟 EngineAttempt → manifest → XML/HTML 自动选择 → 版本化派生文件、SHA256 校验、幂等、篡改拒绝、CLI 结果。
 
 `tests/test_real_m04_opt_in.py`：GitHub-hosted 独立 Docker job 中，实际转换一篇自编最小 TeX，再运行 `normalize`，检查至少一个章节/公式与 MathML、provenance、派生文档 SHA256。测试通过与否应以 PR #10 的具体 CI run 为准。
+
+### 已完成的实际验收
+
+- [GitHub Actions #42204716397](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42204716397)：三组作业全部 success。
+- Python 3.11、3.13：各运行 76 个 unittest，**72 通过、4 个需要实际 Docker 的用例按矩阵设计跳过**；byte-compile 成功。
+- 独立真实 Docker 作业：自编最小 LaTeX → ar5ivist HTML → `normalize` → `PaperDocument`；确认 MathML 存在、结构节点/公式已提取、输入转换 run hash 和独立派生 JSON SHA256 匹配，并通过 M01/M02/M03 真实回归。
+- **仅证明自编样本链路可运行**，不代表大规模真实论文的公式、图表、引用保真、PDF fallback 或 M05 质量门禁通过。
 
 上游参考：[LaTeXML XML element schema](https://math.nist.gov/~BMiller/LaTeXML/manual/schema/LaTeXML-common/)；[latexmlpost mathematics/cross references](https://math.nist.gov/~BMiller/LaTeXML/manual/architecture/latexmlpost/)；[LaTeXML HTML classes](https://math.nist.gov/~BMiller/LaTeXML/manual/cssclasses/)。
 

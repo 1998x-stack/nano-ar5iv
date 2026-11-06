@@ -2,7 +2,7 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.6 M04 Canonical PaperDocument — M01–M03 已合并；M04 实现从已核验 LaTeXML XML / ar5ivist HTML 中生成版本化论文 IR、公式、表格、引用、来源和派生哈希。M04 正在 PR #10 验证；PDF-only fallback、M05–M07 未实现，科学保真度尚未验收。**  
+**项目状态：v0.6 M04 Canonical PaperDocument — M01–M03 已合并；M04 实现从已核验 LaTeXML XML / ar5ivist HTML 中生成版本化论文 IR、公式、表格、引用、来源和派生哈希。M04 的 Python 3.11/3.13 与真实 ar5ivist→PaperDocument CI 已通过；PDF-only fallback、M05–M07 未实现，科学保真度尚未验收。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
 > nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库已实现 M01 基线、M02 入口发现、M03 保守恢复，并新增 M04 的 PaperDocument 归一化；科学质量门禁、PDF-only fallback 和后台服务仍是占位。输出 HTML 不代表论文科学内容保真。
@@ -294,7 +294,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | M01 | 源码快照、CLI、固定镜像适配、provenance | **M01 基线与真实 Docker/CLI 端到端验收通过；科学保真不在 M01 范围** |
 | M02 | 元数据优先的 root 发现、依赖图与多入口 CLI | **自编样本真实 Docker 自动入口与 Python 3.11/3.13 CI 已通过；大规模准确率待评测** |
 | M03 | 显式片段包装、结束标记补全、错误归类和不可变修复审计 | **已合并 main，真实最小转换验收通过** |
-| M04 | 原生 XML / HTML→PaperDocument、公式/表格/引用、稳定 ID 和派生校验 | **M04.1 PR #10 已实现，自动化测试验收中；PDF-only fallback 未实现** |
+| M04 | 原生 XML / HTML→PaperDocument、公式/表格/引用、稳定 ID 和派生校验 | **M04.1 PR #10 已通过真实 Docker/MathML 与 Python 3.11/3.13 CI；PDF-only fallback 未实现** |
 | M05 | 公式/引用/图表的质量门禁 | 仅设计 |
 | M06 | 队列、缓存、API、UI、部署 | 仅设计 |
 | M07 | 可选、受控 LLM 辅助和科研 RAG | 仅设计 |
