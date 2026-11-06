@@ -75,7 +75,6 @@ class NormalizationTests(unittest.TestCase):
     def test_xml_asset_and_bibliography_edges(self):
         d = self.normalize_xml()
         self.assertEqual(len([a for a in d.assets if a.kind == "figure"]), 1)
-        self.assertEqual(next(a for a in d.assets if a.kind == "table").table_rows[0][0].text, "1")
         self.assertEqual(len([a for a in d.assets if a.kind == "table"]), 1)
         self.assertEqual(d.assets[0].caption, "A diagram")
         self.assertEqual(d.assets[0].href, "images/diagram.png")
@@ -122,6 +121,11 @@ class NormalizationTests(unittest.TestCase):
         self.assertIn("RESOLVED", [r.resolution for r in d.relations])
         self.assertTrue(any(x.tag == "div" for x in d.unknown_nodes))
         self.assertNotIn("must not execute", json.dumps(d.to_dict()))
+
+    def test_html_table_cells_preserved(self):
+        d = self.normalize_html()
+        table = next(a for a in d.assets if a.kind == "table")
+        self.assertEqual(table.table_rows[0][0].text, "1")
 
     def test_html_unresolved_references_remain_unresolved(self):
         data = b'<html><p class="ltx_p"><a class="ltx_ref" href="#missing">[?]</a></p></html>'
