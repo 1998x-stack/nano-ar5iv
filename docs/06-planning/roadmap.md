@@ -1,4 +1,4 @@
-# 15｜分阶段交付路线图（M01/M02 基线已通过 CI，科学保真待验证）
+# 15｜分阶段交付路线图（M01/M02 基线验收完成、M03 有界恢复验证中）
 
 ## M00 — Documentation & Evidence（本 PR 目标）
 
@@ -14,7 +14,7 @@
 
 ## M03 — Conservative Recovery
 
-计划：合成包装入口、路径与依赖修复、错误分类、首因分析、有限重试、修复审计。**验收**：R01–R09；没有无审计覆盖作者原文件；无静默吞宏。
+**M03.1 实现（PR #8）**：基线错误根因分类、显式有序 fragment wrapper、以源码和 LaTeXML 日志双重证据补全缺少的 `\end{document}`、至多 1 次重试、源码 SHA256 校验、隔离副本、patch diff + before/after hash 审计与 parent run 关联；未知宏包等无证据场景拒绝修复。**尚未覆盖**：通用路径重写、任意宏包修复、动态 TeX 宏、PDF 兜底和 M05 质量认证。[M03 implementation](../07-reproduction/m03-conservative-recovery.md)。
 
 ## M04 — Canonical PaperDocument
 
