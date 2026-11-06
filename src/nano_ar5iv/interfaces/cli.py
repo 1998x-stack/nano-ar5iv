@@ -18,11 +18,12 @@ from nano_ar5iv.application.recover import recover_existing_root, recover_fragme
 from nano_ar5iv.recovery.strategies import RecoveryPolicy
 from nano_ar5iv.recovery.wrapper import plan_wrapper
 from nano_ar5iv.application.normalize import normalize_run
+from nano_ar5iv.application.evaluate import evaluate_run
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="nano-ar5iv",
-                                     description="M01-M04: source/entry discovery, conversion, bounded recovery, PaperDocument normalization")
+                                     description="M01-M05: conversion, recovery, paper normalization and evidence-based quality evaluation")
     parser.add_argument("--output", required=True, type=Path,
                         help="snapshot and artifact directory (must be outside input)")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -63,9 +64,26 @@ def main(argv: list[str] | None = None) -> int:
     normalize.add_argument("--format", choices=("auto", "xml", "html"), default="auto",
                            help="prefer a verified native XML artifact; fall back to HTML")
 
+    evaluate = sub.add_parser("evaluate", help="M05: audit one existing M04 PaperDocument")
+    evaluate.add_argument("paper_document", type=Path,
+                          help="paper-document.json in the configured normalizations store")
+    evaluate.add_argument("--golden", type=Path, default=None,
+                          help="OPTIONAL externally reviewed, source-bound JSON assertions")
+
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
+        if args.cmd == "evaluate":
+            report, path = evaluate_run(args.paper_document, output, args.golden)
+            print(json.dumps({
+                "status": "ASSESSED", "decision": report.decision,
+                "quality_report_path": str(path),
+                "document_id": report.document_id,
+                "reference_sha256": report.reference_sha256,
+                "dimensions": {name: result.status for name, result in report.dimensions.items()},
+                "reason_codes": list(report.reason_codes),
+            }, ensure_ascii=False, indent=2))
+            return {"ACCEPTED": 0, "PARTIAL": 3, "REVIEW_REQUIRED": 3, "REJECTED": 4}[report.decision]
         if args.cmd == "normalize":
             document, path = normalize_run(args.run_manifest, output, args.format)
             print(json.dumps({

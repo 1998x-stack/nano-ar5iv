@@ -1,4 +1,4 @@
-name: Python M01-M04 tests
+name: Python M01-M05 tests
 
 on:
   pull_request:
@@ -71,6 +71,11 @@ jobs:
         env:
           RUN_REAL_LATEXML: "1"
         run: python -m unittest discover -s tests -p 'test_real_m04_opt_in.py' -v
+
+      - name: Real M05 evidence quality gate (must abstain without golden)
+        env:
+          RUN_REAL_LATEXML: "1"
+        run: python -m unittest discover -s tests -p 'test_real_m05_opt_in.py' -v
 
       - name: Run complete M01 CLI and check checksums
         shell: bash

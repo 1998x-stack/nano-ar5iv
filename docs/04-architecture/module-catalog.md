@@ -1,6 +1,6 @@
-# M00-B/M01–M04｜模块清单：四阶段部分实现，后续 M05–M07 占位
+# M00-B/M01–M05.1｜模块清单：五阶段核心子集，M05 视觉与 M06–M07 占位
 
-本页保留 M00 模块职责的最初规划，**现在 M01–M04 的核心模块已经实现**，具体能力和差异见 [M01 baseline](../07-reproduction/m01-baseline.md)。M03 的 recovery 类目及应用编排已由占位升级为真实保守修复代码，未实现的其他 .py 仍只有 docstring/TODO。详见 [M03](../07-reproduction/m03-conservative-recovery.md)。M04 已有真实 `PaperDocument`、`DocumentNode`、`Equation`、`TableCell`、`Asset`、`Citation`、`Relation` 类型，后续 QualityReport 与批量 API 仍是规划。详见 [M04](../07-reproduction/m04-paper-document.md)。
+本页保留 M00 模块职责的最初规划，**现在 M01–M05.1 的核心模块已经实现**，具体能力和差异见 [M01 baseline](../07-reproduction/m01-baseline.md)。M03 的 recovery 类目及应用编排已由占位升级为真实保守修复代码，未实现的其他 .py 仍只有 docstring/TODO。详见 [M03](../07-reproduction/m03-conservative-recovery.md)。M04 已有真实 `PaperDocument`、`DocumentNode`、`Equation`、`TableCell`、`Asset`、`Citation`、`Relation` 类型，QualityReport 和六维 QualityGate 在 M05.1 已有真实代码，批量 API、真实 PDF/视觉对照仍是规划。详见 [M04](../07-reproduction/m04-paper-document.md)。
 
 ## Category 1：domain（不引用外层）
 
@@ -20,7 +20,7 @@
 | `application/discover.py` | `discover_entrypoints` | bundle→EntryDecision |
 | `application/convert.py` | `convert_roots` | EntryDecision→EngineAttempt[] |
 | `application/recover.py` | `recover_with_budget` | diagnostics→RecoveryAttempt[] |
-| `application/evaluate.py` | `evaluate_document` | attempts→QualityReport |
+| `application/evaluate.py` | `evaluate_run` | 源码/转换/IR/黄金断言→不可变 QualityReport |
 | `application/replay.py` | `replay_job` | manifest→repeatable artifacts |
 
 ## Category 3：source（静态可观测，不模拟全 TeX）

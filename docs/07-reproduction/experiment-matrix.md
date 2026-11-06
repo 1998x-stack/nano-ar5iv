@@ -1,6 +1,6 @@
 # 复现测试矩阵与对照实验（计划）
 
-**状态：TESTS NOT IMPLEMENTED / RESULTS NOT RUN。** 所有如下测试都是计划的 fixture/期望断言，不是历史测试通过记录。
+**状态更新（M05.1）**：E/R 已有 M01–M03 单元/真实基线测试；Q 类已在 `tests/test_m05_quality.py`、`test_m05_integration.py` 添加部分自编黄金与对抗样本，Q01/Q03/Q05/Q07 的基本负向行为有代码覆盖，真实 PDF/视觉/长尾科学完整性和 Q02/Q04/Q06/Q08 的完整验收仍未进行。下面是总体实验矩阵，**不得把列出的计划用例当成全部通过**。详见 [M05 evidence gate](m05-quality-gate.md)。
 
 ## A. 入口发现（E）
 

@@ -46,3 +46,12 @@ See [M03 recovery](../docs/07-reproduction/m03-conservative-recovery.md).
 [M04 guide](../docs/07-reproduction/m04-paper-document.md).
 
 M04 验收：GitHub Actions [#42204716397](https://github.com/1998x-stack/nano-ar5iv/actions/runs/42204716397) 三组 CI success；Python 3.11/3.13 各 76 test（72 pass，4 skipped），独立 Docker M01–M04 转换链路成功。结果仅适用于测试覆盖与自编最小 TeX，**不等于已完成科学内容质量验收**。
+
+### M05.1 evidence quality gates
+
+- `test_m05_quality.py`: independent golden fixture, mismatched math TeX/MathML symbols, dangling citation, table/section edits, missing visual review, HTML abstention and unsupported golden JSON.
+- `test_m05_integration.py`: M01→M04→M05, immutable SHA256 report, idempotence, tampered original source/run/IR/artifact and CLI exit codes.
+- `test_real_m05_opt_in.py`: real ar5ivist HTML → M04 IR → M05 quality report; **without golden must NOT ACCEPTED** (could be REVIEW_REQUIRED or REJECTED when an actual hard failure is observed).
+- The independent golden fixture is self-authored test evidence. **It is not a real-world calibrated quality dataset**. Actual CI results appear on [M05 PR #11](https://github.com/1998x-stack/nano-ar5iv/pull/11).
+
+[M05 quality gate](../docs/07-reproduction/m05-quality-gate.md).

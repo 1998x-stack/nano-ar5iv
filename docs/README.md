@@ -25,17 +25,22 @@
 ## M02 真实功能
 
 - [M02 Entry Discovery 实现、CLI 与验收](07-reproduction/m02-entry-discovery.md)：arXiv 元数据主入口、静态依赖图、明确歧义状态、optional top-k trial、真实 Docker 测试。
-- 旧 M00 的架构设计和 M01 的基线说明依然保留，M04 的 PaperDocument 归一化已实现代码，M05–M07 仍属于规划。
+- 旧 M00 的架构设计和 M01 的基线说明依然保留，M04 的 PaperDocument 归一化已实现代码，M05.1 证据门禁已有代码，完整 M05 视觉/PDF 与 M06–M07 仍属于规划。
 
 ## M03 保守恢复功能
 
 - [M03 保守式源码恢复、操作方法和审计契约](07-reproduction/m03-conservative-recovery.md)：失败基线后的有限结束标记补全、明确有序片段包装、沙箱副本、SHA256 以及拒绝不可信补丁。
-- M03 的 `RECOVERED_UNVERIFIED` 不代表数学或科学内容正确；M04 的 XML/HTML 归一化已实现，M05 科学门禁尚未实现。
+- M03 的 `RECOVERED_UNVERIFIED` 不代表数学或科学内容正确；M04 的 XML/HTML 归一化已实现，M05.1 已实现有限检查；完整科学门禁仍待视觉/PDF 验证。
 
 ## M04 结构化论文 IR
 
 - [M04 Canonical PaperDocument 真实实现、CLI、数据契约与边界](07-reproduction/m04-paper-document.md)：XML/HTML、MathML、TeX、表格、引用、未知结构、SHA256 来源和幂等派生。
 - M04 不等于 M05：归一化成功不代表公式、图表或文献保真通过；所有结果 `NOT_EVALUATED`。
+
+## M05.1 证据优先科学质量门禁
+
+- [M05 真实实现、CLI、黄金断言协议、六维门禁和状态决策](07-reproduction/m05-quality-gate.md)。
+- M05.1 `ACCEPTED` 仅针对来源绑定的独立提供断言；人类审校身份不能由程序自行认证，不能代替全面论文保真评审。
 
 ## 文档约定
 

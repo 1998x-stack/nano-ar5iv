@@ -1,6 +1,6 @@
-# 09｜代码 Category 与实际占位目录（Architecture Scaffold + M01–M04 v0.6）
+# 09｜代码 Category 与实际占位目录（Architecture Scaffold + M01–M05.1 v0.7）
 
-> **更新于 2026-11-06：本文件中的模块和目录已创建，**M01/M02 的源码快照、Docker 转换、入口发现、依赖图及 M03 的保守修复和 CLI 均已有代码；M04 PaperDocument/归一化已实现，后续 M05–M07 仍为占位**；M01/M02 已通过真实 ar5ivist 转换，M03 已通过真实转换回归；科学质量门禁及 API 服务尚未实现。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
+> **更新于 2026-11-06：本文件中的模块和目录已创建，**M01/M02 的源码快照、Docker 转换、入口发现、依赖图及 M03 的保守修复和 CLI 均已有代码；M04 PaperDocument/归一化已实现，M05.1 有真实多维证据门禁，但视觉与 M06–M07 仍为占位**；M01/M02 已通过真实 ar5ivist 转换，M03 已通过真实转换回归；M05.1 已有有限质量门禁，真实视觉/PDF 与 API 服务尚未实现。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
 
 ## 1. 代码分层原则
 
@@ -152,4 +152,4 @@ ingest→source inventory→manifest→dependency graph→root selection
 
 ## 6. 实现切片和改动纪律
 
-详见 [implementation-slices.md](../07-reproduction/implementation-slices.md)。以 §M01→M02→M03→M04→M05→M06§ 推进，每一阶段需要固定工具版本、授权 fixture、测试和回归报告。M01–M04 已有实际功能及回归测试，M05–M07 尚未实现；PDF-only fallback 未实现。
+详见 [implementation-slices.md](../07-reproduction/implementation-slices.md)。以 §M01→M02→M03→M04→M05→M06§ 推进，每一阶段需要固定工具版本、授权 fixture、测试和回归报告。M01–M05.1 已有实际功能及回归测试，完整 M05 视觉比较与 M06–M07 尚未实现；PDF-only fallback 未实现。

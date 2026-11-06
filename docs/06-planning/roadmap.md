@@ -1,4 +1,4 @@
-# 15｜分阶段交付路线图（M01–M03 已验收，M04.1 已通过 CI）
+# 15｜分阶段交付路线图（M01–M04 已验收，M05.1 实施中）
 
 ## M00 — Documentation & Evidence（本 PR 目标）
 
@@ -22,7 +22,7 @@
 
 ## M05 — Quality Gate & Golden Dataset
 
-计划：保真度多维门禁、数学符号对照、文献图、资源差分、必要的浏览器视觉检查。**验收**：Q01–Q08，测量 false acceptance/false rejection，报告 `not_run`，禁止零证据 ACCEPTED。
+**M05.1 已实现（PR #11）**：六维 `QualityReport`、原始源码/产物 SHA256 核验、对调用者独立提供的黄金断言比较章节、数学 TeX/MathML tokens、引用连边、图/表、视觉适用性。明确区分 `PASS/FAIL/UNKNOWN/NOT_RUN/NOT_APPLICABLE`，绝不将未验证输出自动 `ACCEPTED`；`evaluate` CLI 与独立不可变报告已接入。**未实现**：真实 PDF/浏览器视觉差分、原始 TeX→MathML 全量符号对齐、真实 arXiv 语料的 false-acceptance / false-rejection 度量（M05.2/M05.3）。参见 [M05 guide](../07-reproduction/m05-quality-gate.md)。
 
 ## M06 — Batch Runtime & Service
 
