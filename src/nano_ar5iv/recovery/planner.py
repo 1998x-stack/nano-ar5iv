@@ -15,8 +15,9 @@ def plan_append_end(bundle: SourceBundle, entry: str,
         return None
     if baseline.status in {"SUCCEEDED", "ENGINE_UNAVAILABLE", "TIMED_OUT"}:
         return None
-    if diagnosis.family in {"MISSING_PACKAGE", "UNKNOWN_MACRO", "MATH_PARSE", "ASSET_MISSING",
-                            "BIB_MISSING", "MISSING_INPUT", "ENGINE_UNAVAILABLE", "TIMEOUT"}:
+    # A structural marker alone is not enough: require corroborating converter
+    # diagnostics to avoid treating unrelated failures as truncation.
+    if diagnosis.family != "MISSING_DOCUMENT_END":
         return None
     root = validate_entry(bundle, entry)
     file_info = next(f for f in bundle.files if f.path == root)

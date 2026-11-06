@@ -19,6 +19,9 @@ class FailureDiagnosis:
 
 
 _RULES: tuple[tuple[str, re.Pattern], ...] = (
+    ("MISSING_DOCUMENT_END", re.compile(
+        r"(?i)(?:missing\s+(?:\\end\{document\}|end\s+(?:of\s+)?document|document\s+end)|"
+        r"missing\s+document\s+end|unexpected\s+end\s+of\s+file)")),
     ("MISSING_PACKAGE", re.compile(r"(?i)(?:not found|missing|cannot find|couldn't find).{0,80}\.(?:sty|cls)\b|"
                                    r"(?:\.(?:sty|cls)).{0,80}(?:not found|missing|cannot find)")),
     ("MISSING_INPUT", re.compile(r"(?i)(?:not found|missing|cannot find).{0,80}\.(?:tex|ltx)\b|"

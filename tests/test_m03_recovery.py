@@ -103,6 +103,20 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(result.diagnosis["family"], "MISSING_PACKAGE")
         self.assertIsNone(result.plan)
 
+    def test_unrelated_baseline_failure_must_not_trigger_append(self):
+        self.put("paper.tex", "\\documentclass{article}\\n\\begin{document}\\nHello\\n")
+        class UnrelatedFailure(BoundaryEngine):
+            def convert(self, workspace, entry, timeout_seconds):
+                self.calls += 1
+                (workspace / "engine.stderr.txt").write_text("Error: Invalid bibliography reference")
+                return EngineAttempt("FAILED", self.image, None, entry, 1,
+                                     0.1, False, ("fake",), 1, None)
+        engine = UnrelatedFailure()
+        result = recover_existing_root(self.bundle(), "paper.tex", engine, self.store)
+        self.assertEqual(result.status, "REVIEW_REQUIRED")
+        self.assertEqual(engine.calls, 1)
+        self.assertIsNone(result.plan)
+
     def test_policy_can_disable_repair(self):
         self.put("paper.tex", "\\documentclass{article}\n\\begin{document}\nHello\n")
         engine = BoundaryEngine()
@@ -184,7 +198,7 @@ class RecoveryTests(unittest.TestCase):
             def convert(self, workspace, entry, timeout_seconds):
                 # Files are produced, but never claim successful conversion.
                 self.calls += 1
-                (workspace / "engine.stderr.txt").write_text("Error: broken document")
+                (workspace / "engine.stderr.txt").write_text("Error: Missing document end")
                 return EngineAttempt("FAILED", self.image, None, entry, 1,
                                      0.1, False, ("fake",), 1, None)
         engine = AlwaysFail()
