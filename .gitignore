@@ -28,3 +28,8 @@ workspaces/
 !.env.example
 *.key
 *.pem
+
+# Preserve future golden fixtures that include build artifacts.
+!tests/fixtures/**/*.bbl
+!tests/fixtures/**/*.blg
+!tests/fixtures/**/*.aux

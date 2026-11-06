@@ -19,42 +19,58 @@
 ## 二、端到端伪代码（不可执行）
 
 ~~~python
+# DESIGN PSEUDOCODE ONLY — not a runnable implementation.
 def process(request: ConversionRequest, ports: ConversionPorts) -> JobResult:
-    bundle = ports.ingest_and_snapshot(request.input)  # immutable, hash
+    bundle = ports.ingest_and_snapshot(request.input)
     inventory = ports.inventory(bundle)
-    roots = ports.find_roots(bundle, inventory)          # may be multiple
+    roots = ports.find_roots(bundle, inventory)
     if roots.status == "AMBIGUOUS":
         return JobResult(status="REVIEW_REQUIRED", evidence=roots.evidence)
+    if roots.status == "NO_TEX":
+        return ports.pdf_fallback_or_review(bundle, request.policy)
 
-    document_results = []
+    results = []
     for root in roots.selected_roots:
         attempts = []
-        baseline = ports.engine.convert(bundle, root, request.config)
-        attempts.append(baseline)
-        best = baseline
+        current = ports.engine.convert(bundle, root, request.config)
+        attempts.append(current)
+
+        def inspect(attempt):
+            paper = (ports.normalizer.to_paper_document(attempt)
+                     if attempt.has_readable_structure else None)
+            return paper, ports.quality.assess(bundle, paper, attempts)
+
+        best_paper, best_report = inspect(current)
+        best_attempt = current
 
         for repair_round in range(request.max_repair_rounds):
-            if ports.quality.enough_evidence_for_accept(best):
+            if best_report.decision == "ACCEPTED":
                 break
-            diagnostic = ports.diagnostics.root_cause(best.logs)
-            repair = ports.recovery.propose(diagnostic, best, bundle)
-            if repair is None or not repair.is_allowlisted:
+            cause = ports.diagnostics.root_cause(current.logs)
+            repair = ports.recovery.propose(cause, current, bundle)
+            if repair is None or not ports.recovery.is_allowlisted(repair):
                 break
-            working_copy = ports.workspace.apply_copy_on_write(repair)
-            candidate = ports.engine.convert(working_copy, root, request.config)
+            workspace = ports.workspace.apply_copy_on_write(repair)
+            candidate = ports.engine.convert(workspace, root, request.config)
             attempts.append(candidate)
-            best = ports.comparator.choose_without_scientific_regression(
-                best, candidate, evidence_only=True
-            )
+            candidate_paper, candidate_report = inspect(candidate)
 
-        paper = ports.normalizer.to_paper_document(best)
-        report = ports.quality.assess(bundle, paper, attempts)
-        document_results.append((paper, report, attempts))
+            if ports.quality.has_verified_non_regression(
+                best_report, candidate_report, bundle
+            ):
+                best_attempt, best_paper, best_report = (
+                    candidate, candidate_paper, candidate_report
+                )
+            else:
+                ports.audit.record_rejected_candidate(candidate, candidate_report)
+            current = candidate
 
-    return ports.artifacts.persist_with_manifest(document_results)
+        results.append((best_attempt, best_paper, best_report, attempts))
+
+    return ports.artifacts.persist_with_manifest(results)
 ~~~
 
-**重要**：上面的 `quality.enough_evidence_for_accept` 只是接口意图，不是“运行时尝试是否成功”。真正验收必须按 quality 维度和来源证据判断；`choose_without_scientific_regression` 在缺对照时**不得声明质量改善**。若没有可用入口且无 TeX，按策略触发独立 PDF 路径并保留来源。
+**重要**：每次候选转换先规范化与评估，再依据已验证的证据决定是否替代上一结果；证据不足时不宣称修复改善。伪代码里所有 Port/函数都是设计接口，尚不可执行。只有 PDF 的输入应独立降级并保留来源。
 
 ## 三、入口发现具体分支
 
