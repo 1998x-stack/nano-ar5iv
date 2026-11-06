@@ -100,6 +100,13 @@ def _load_evidence(document_path: Path, output_root: Path) -> tuple[
             manifest.get("derivation_id") != derivation_id or
             manifest.get("normalizer_version") != "m04.1"):
         raise InvalidEvidence("Normalization manifest is inconsistent")
+    expected_derivation = sha256_bytes(stable_json({
+        "run_id": run_id, "input_sha256": manifest.get("input_sha256"),
+        "normalizer_version": "m04.1", "schema_version": "1.0",
+        "format": manifest.get("input_format"),
+    }))
+    if expected_derivation != derivation_id:
+        raise InvalidEvidence("Normalization derivation key does not match inputs")
     encoded, raw = _safe_json(path)
     digest = sha256_bytes(raw)
     if manifest.get("paper_document_sha256") != digest:
@@ -107,6 +114,12 @@ def _load_evidence(document_path: Path, output_root: Path) -> tuple[
     document = _document(encoded)
     if document.provenance.get("run_id") != run_id:
         raise InvalidEvidence("PaperDocument run ID does not match derivation")
+    import hashlib
+    expected_doc_id = "paper:" + hashlib.sha256((
+        str(document.provenance.get("source_bundle_id")) + "|" + document.root_path
+    ).encode("utf-8")).hexdigest()[:24]
+    if document.document_id != expected_doc_id:
+        raise InvalidEvidence("Canonical document identity mismatch")
     run_path = output / "runs" / run_id / "manifest.json"
     run, run_raw = _safe_json(run_path, 2 * 1024 * 1024)
     if sha256_bytes(run_raw) != document.provenance.get("source_run_manifest_sha256"):
@@ -128,6 +141,8 @@ def _load_evidence(document_path: Path, output_root: Path) -> tuple[
     file_records = snapshot.get("files", [])
     if not isinstance(file_records, list) or len(file_records) > 500:
         raise InvalidEvidence("Invalid source inventory")
+    if sha256_bytes(stable_json(file_records)) != bundle_id:
+        raise InvalidEvidence("Source inventory fingerprint no longer matches bundle ID")
     for record in file_records:
         if not isinstance(record, dict):
             raise InvalidEvidence("Invalid source inventory item")
