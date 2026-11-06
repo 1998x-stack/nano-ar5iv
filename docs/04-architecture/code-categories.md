@@ -1,106 +1,155 @@
-# 09｜代码 Category 与建议目录树（仅设计）
+# 09｜代码 Category 与实际占位目录（Architecture Scaffold v0.2）
 
-> **未创建下列 `src/` 或 `tests/` 目录，所有名称仅代表未来实现责任边界。** 采用 Python 主导编排、外部 LaTeXML 子进程/容器、未来可插拔 Rust 扫描器的渐进路线。
+> **更新于 2026-11-06：本文件中的 Python 模块和目录现已实际创建，但每个 .py 仅包含 docstring/TODO，**无任何业务逻辑、转换器、CLI/API、测试脚本或容器实现。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
+
+## 1. 代码分层原则
+
+架构目标是 **Python Modular Monolith + isolated external LaTeXML worker**，未来视实际性能再决定是否引入 Rust 实现扫描/依赖图。领域与存储、调度、引擎和接口必须解耦。
+
+~~~text
+interfaces (CLI / HTTP API)  [future]
+      |
+application (use-case orchestrators)
+      |                     \
+      +-- domain (data)      +-- ports (contracts)
+                                    ^
+                                    |
+                           adapters + infrastructure
+source, recovery, normalization, quality: pure policies/transforms whenever possible
+~~~
+
+**依赖倒置的具体解释**：Ports 是 interface abstractions，不是额外的第十个业务 Domain；application 可导入 domain 和 ports，但不应直接使用 GitHub、Docker 或 LaTeXML 实现类型。adapters/infrastructure 只实现外部边界；domain 不依赖任何外部组件。
+
+## 2. 真实目录树（已提交，但均为占位）
 
 ~~~text
 nano-ar5iv/
 ├── README.md
-├── docs/                         # 现有：研究、架构、测试、路线图
-├── pyproject.toml                 # 未来
-├── src/nano_ar5iv/               # 未来
-│   ├── domain/                   # Category 1: pure models + invariants
-│   │   ├── source.py
-│   │   ├── documents.py
-│   │   ├── diagnostics.py
-│   │   ├── provenance.py
-│   │   └── states.py
-│   ├── application/              # Category 2: orchestration
+├── CONTRIBUTING.md
+├── pyproject.toml                    # 仅打包元数据：0.0.0，无 CLI、无运行依赖
+├── .gitignore
+├── docs/
+│   ├── 01-foundations/              # LaTeXML、MathML 与 ar5iv 技术
+│   ├── 02-source-recovery/          # root 发现、异常修复
+│   ├── 03-research/                 # 论文/博客/issue
+│   ├── 04-architecture/             # 架构、代码分类、接口和复现逻辑
+│   ├── 05-quality/                  # 测试、质量、安全
+│   ├── 06-planning/                 # 分阶段路线
+│   └── 07-reproduction/             # 原始上游可重复实验与实施计划
+├── src/nano_ar5iv/
+│   ├── domain/
+│   │   ├── source.py                # bundle / entry / document set
+│   │   ├── documents.py             # PaperDocument / scientific IR
+│   │   ├── diagnostics.py           # events and error categories
+│   │   ├── provenance.py            # source spans and hashes
+│   │   └── states.py                # job/quality lifecycle
+│   ├── application/
 │   │   ├── ingest.py
 │   │   ├── discover.py
-│   │   ├── recover.py
 │   │   ├── convert.py
-│   │   └── evaluate.py
-│   ├── source/                   # Category 3: source discovery
+│   │   ├── recover.py
+│   │   ├── evaluate.py
+│   │   └── replay.py
+│   ├── source/
+│   │   ├── archive.py
 │   │   ├── inventory.py
 │   │   ├── arxiv_manifest.py
 │   │   ├── tex_scanner.py
 │   │   ├── dependency_graph.py
 │   │   └── entry_ranker.py
-│   ├── recovery/                 # Category 4: policy + patch planning
+│   ├── recovery/
 │   │   ├── classifier.py
 │   │   ├── strategies.py
 │   │   ├── wrapper.py
 │   │   ├── patch_policy.py
 │   │   └── planner.py
-│   ├── adapters/                 # Category 5: external engines
-│   │   ├── latexml/
-│   │   │   ├── runner.py
-│   │   │   ├── diagnostics.py
-│   │   │   └── output_reader.py
-│   │   ├── pdf/
-│   │   │   └── extraction.py
-│   │   └── sources/
-│   │       └── arxiv.py
-│   ├── normalization/            # Category 6: canonical PaperDocument
+│   ├── adapters/
+│   │   ├── latexml/{runner,diagnostics,output_reader}.py
+│   │   ├── pdf/extraction.py
+│   │   └── sources/arxiv.py
+│   ├── normalization/
 │   │   ├── xml_to_ir.py
 │   │   ├── html_to_ir.py
-│   │   └── citation_graph.py
-│   ├── quality/                  # Category 7: validation and evidence
+│   │   ├── citation_graph.py
+│   │   └── assets.py
+│   ├── quality/
 │   │   ├── structural.py
 │   │   ├── mathematical.py
 │   │   ├── bibliography.py
+│   │   ├── assets.py
 │   │   ├── visual.py
 │   │   └── reporting.py
-│   ├── infrastructure/           # Category 8: jobs, storage, sandbox
+│   ├── infrastructure/
 │   │   ├── workspaces.py
 │   │   ├── repositories.py
 │   │   ├── cache.py
-│   │   └── sandbox.py
-│   ├── interfaces/               # Category 9: entrypoints
-│   │   ├── cli.py
-│   │   └── api.py
-│   └── config.py
-├── tests/                         # 未来：unit/contract/integration/e2e
-│   ├── fixtures/
-│   │   ├── valid/
-│   │   ├── missing-entry/
-│   │   ├── multiple-roots/
-│   │   ├── missing-package/
-│   │   ├── math-fidelity/
-│   │   └── bibliography/
+│   │   ├── sandbox.py
+│   │   └── jobs.py
+│   ├── interfaces/{cli,api,reporting}.py
+│   ├── ports/{engines,stores,quality,runtime}.py
+│   ├── config.py
+│   └── README.md
+├── tests/
 │   ├── unit/
 │   ├── contract/
 │   ├── integration/
-│   └── e2e/
-└── tools/                         # 未来：只放可复现的离线辅助脚本
+│   ├── e2e/
+│   ├── security/
+│   ├── performance/
+│   └── fixtures/{entry-discovery,source-recovery,math-fidelity,
+│                 bibliography,asset-fidelity,security}/
+├── configs/                          # No actual policies yet
+├── deployment/                       # No Dockerfiles, no compose
+├── examples/                         # No sample papers/fixtures yet
+├── benchmarks/                       # No measured data
+└── scripts/                          # No executable scripts
 ~~~
 
-## 依赖规则
+所有 Python package 包含文档字符串型 __init__.py；所有空测试目录由 .gitkeep 保存。**目录存在 ≠ 模块已实现**。
 
-`domain <- application <- interfaces`；`application` 依赖 Adapter Protocol，而非调用 LaTeXML CLI 细节。`source/recovery/quality` 不相互循环依赖；`infrastructure` 负责提供可替换的 Ports 实现。PDF fallback 不修改 TeX 恢复计划，只生成不同 provenance 的标准 IR。
+## 3. 九大业务 Category
 
-## 类别责任矩阵
-
-| Category | 输入 | 输出 | 首要测试 |
+| 类目 | 唯一责任 | 输入 → 产物 | 实现阶段 |
 |---|---|---|---|
-| 1 domain | 规范化字段 | immutable entities | schema/invariant |
-| 2 application | request + ports | attempt lifecycle | state transitions |
-| 3 source | archive tree + manifests | entry candidates + dependency graph | ambiguous source fixtures |
-| 4 recovery | diagnostics + source spans | immutable repair plan | patch/idempotency |
-| 5 adapters | engine invocation | raw XML/HTML/logs | version contract |
-| 6 normalization | parsed outputs | PaperDocument | stable IDs/refs |
-| 7 quality | IR + source evidence | assessment + gate | goldens/diff |
-| 8 infrastructure | job spec | sandbox/artifacts/checkpoints | security/recovery |
-| 9 interfaces | CLI/API requests | validated commands | compatibility/error responses |
+| 01 domain | 来源与文档业务契约 | bytes/metadata → SourceBundle/PaperDocument | M01/M04 |
+| 02 application | 有界用例编排 | job request → JobResult / attempt records | M01–M06 |
+| 03 source | 发现/依赖/入口选择 | source bundle → EntryDecision/DocumentSet | M02 |
+| 04 recovery | 根因归类、策略和副本修复 | diagnostic → RecoveryPlan + immutable patch | M03 |
+| 05 adapters | 所有外部解析/转换执行 | workspace → XML/HTML/log/asset | M01/M04 |
+| 06 normalization | 中间表示到标准科学文档 | XML/HTML/PDF → PaperDocument | M04 |
+| 07 quality | 结构/科学保真/视觉校验 | IR + evidence → QualityReport | M05 |
+| 08 infrastructure | 沙箱/缓存/存储/任务安全 | job → isolated attempts/artifacts | M01/M06 |
+| 09 interfaces | CLI/API/报告交付 | external request → application use case | M06 |
 
-## 明确不建议的组织方式
+### Ports 横切层
 
-- 一上来把每个阶段拆成微服务；
-- 将 CLI 运行/日志正则/IR 构造混入一个大文件；
-- 用 `utils.py` 堆积无分类的 TeX 规则；
-- 让 LLM 成为没有边界的全文件改写器；
-- 将生成 HTML 当作可唯一代表论文的事实源。
+- engines：§ConversionEngine.convert()§。
+- stores：§SourceRepository / ArtifactStore§。
+- quality：§QualityGate.assess()§。
+- runtime：§Sandbox / JobCheckpoint§。
 
-## 下一步代码顺序（尚未执行）
+只有接口语义，没有运行代码。接口应在 M01 按真实样本逐步收紧，而非先制造过宽的通用框架。
 
-`domain+contracts → source scanner+manifest → adapter → recovery policy → normalization → quality → batch execution → API/UI`，每一阶段都先添加 fixture 与真实转换证据。
+## 4. 调用顺序与所有权
+
+~~~text
+ingest→source inventory→manifest→dependency graph→root selection
+      →engine convert→diagnostics→bounded recovery→normalization
+      →quality/acceptance→persist artifacts→user report
+~~~
+
+- Source 只负责解释原料，不碰网络、Docker、输出报告。
+- Recovery 生成修复计划，但不直接修改作者原件。
+- Adapter 必须返回原始日志/exit status，不能静默过滤 error。
+- Normalization 对未知节点保留 raw provenance，不丢弃。
+- QualityGate 分开 report success 与 scientific fidelity。
+- Infrastructure 统一执行资源隔离、对象存储与任务回放。
+- Interfaces 不绕过 application 直接执行 shell。
+
+## 5. 反模式
+
+不使用“超级 utils.py”；不将 CSS class 当永久科学数据 schema；不在前端运行 TeX；不盲目合并多个 root；不在未知引用/公式上让 LLM 编造内容；不把 Docker 官方示例当成安全生产沙箱；不把占位模块按运行能力宣告。
+
+## 6. 实现切片和改动纪律
+
+详见 [implementation-slices.md](../07-reproduction/implementation-slices.md)。以 §M01→M02→M03→M04→M05→M06§ 推进，每一阶段需要固定工具版本、授权 fixture、测试和回归报告。在此之前，本目录只有 docstrings 与 TODOs，不提供任何运行能力。

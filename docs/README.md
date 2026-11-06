@@ -10,6 +10,18 @@
 - 开始软件设计：`04-architecture/system-architecture.md` → `code-categories.md` → `data-contracts.md` → `decisions.md`。
 - 开发前必读：`05-quality/evaluation.md`、`security.md`、`test-strategy.md`、`06-planning/roadmap.md`。
 
+## 新增：可复现开发蓝图（M00-B）
+
+- [函数级复现蓝图](04-architecture/reproduction-blueprint.md)：源码入口 → 转换 → 修复 → IR → 质量门禁。
+- [模块 Catalog 与真实占位文件](04-architecture/module-catalog.md)：50 个无逻辑 .py 模块与 Ports。
+- [上游最小复现实验](07-reproduction/README.md)：手动 ar5ivist/LaTeXML 实验、实验记录。
+- [运行时序、API 与状态机](07-reproduction/interface-sequence.md)：未来接口设计，当前不可调用。
+- [实验与测试矩阵](07-reproduction/experiment-matrix.md)：入口/恢复/科学保真/安全。
+- [故障根因排查](07-reproduction/failure-triage.md)：异常分类、停止条件。
+- [M01–M07 逐文件实施步骤](07-reproduction/implementation-slices.md)：模块、阶段、验收。
+
+当前 `src/nano_ar5iv/`、`tests/`、`configs/`、`deployment/`、`examples/` 等目录**已创建为占位结构**，但不包含业务逻辑、转换引擎、可运行测试或部署文件。
+
 ## 文档约定
 
 - 使用 `[F]` 表示核实的外部事实、`[O]` 表示外部报告/意见、`[D]` 表示本项目设计决策、`[H]` 表示待验证假设。
