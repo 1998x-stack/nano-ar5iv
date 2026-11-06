@@ -53,6 +53,6 @@ def classify_failure(log: str, *, status: str = "FAILED", exit_code: int | None 
         "engine_status": status,
         "confidence": "HEURISTIC" if first is not None else "UNCONFIRMED",
         "root_cause_proven": False,
-        "review_required": True  # No log error cannot establish scientific fidelity.,
+        "review_required": True,  # No log error can establish scientific fidelity.,
         "truncated_diagnostics": len(events) == 1000,
     }
