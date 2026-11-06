@@ -1,10 +1,8 @@
-"""ARCHITECTURE PLACEHOLDER: application/ingest.py
+"""Ingest one trusted local directory into the content-addressed snapshot store."""
+from pathlib import Path
+from nano_ar5iv.domain.source import SourceBundle
+from nano_ar5iv.infrastructure.repositories import SnapshotStore
 
-Planned responsibility: snapshot and ingestion use-case.
-Phase: M01–M06.
-Input/output contracts: docs/04-architecture/module-catalog.md.
-Workflow design: docs/04-architecture/reproduction-blueprint.md.
 
-TODO: define interfaces, implement logic and add tests in the planned phase.
-Current runtime behavior: none. No converters or services are implemented.
-"""
+def ingest_source(source_dir: Path, store: SnapshotStore) -> SourceBundle:
+    return store.capture(source_dir)

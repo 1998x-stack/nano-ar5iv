@@ -1,6 +1,6 @@
-# M00-B｜真实占位模块清单：函数、责任、契约、测试入口
+# M00-B/M01｜模块清单：部分 M01 已实现，其他模块仍是占位
 
-本页是 `src/nano_ar5iv/` 实际占位文件的设计导航。**占位 .py 仅含 docstring/TODO，不承诺可导入的类/函数或执行功能**。
+本页保留 M00 模块职责的最初规划，**现在 M01 部分模块已经实现**，具体能力和差异见 [M01 baseline](../07-reproduction/m01-baseline.md)。未实现的其他 .py 仍只有 docstring/TODO。规划中尚未实现的实体（如 PaperDocument）不应被视为实际 API。
 
 ## Category 1：domain（不引用外层）
 

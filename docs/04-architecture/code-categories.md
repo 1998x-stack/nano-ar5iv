@@ -1,6 +1,6 @@
-# 09｜代码 Category 与实际占位目录（Architecture Scaffold v0.2）
+# 09｜代码 Category 与实际占位目录（Architecture Scaffold + M01 v0.3）
 
-> **更新于 2026-11-06：本文件中的 Python 模块和目录现已实际创建，但每个 .py 仅包含 docstring/TODO，**无任何业务逻辑、转换器、CLI/API、测试脚本或容器实现。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
+> **更新于 2026-11-06：本文件中的模块和目录已创建，**部分 M01 Python 文件已实现真实源码快照、Docker 转换适配和 CLI，其余仍为 docstring/TODO 占位**；尚未跑通真实 LaTeXML 或实现质量/恢复/API 服务。真实模块清单见 [module-catalog](module-catalog.md)，完整流程见 [reproduction-blueprint](reproduction-blueprint.md)。
 
 ## 1. 代码分层原则
 
@@ -20,7 +20,7 @@ source, recovery, normalization, quality: pure policies/transforms whenever poss
 
 **依赖倒置的具体解释**：Ports 是 interface abstractions，不是额外的第十个业务 Domain；application 可导入 domain 和 ports，但不应直接使用 GitHub、Docker 或 LaTeXML 实现类型。adapters/infrastructure 只实现外部边界；domain 不依赖任何外部组件。
 
-## 2. 真实目录树（已提交，但均为占位）
+## 2. 真实目录树（M01 部分实现，其余占位）
 
 ~~~text
 nano-ar5iv/
@@ -105,7 +105,7 @@ nano-ar5iv/
 └── scripts/                          # No executable scripts
 ~~~
 
-所有 Python package 包含文档字符串型 __init__.py；所有空测试目录由 .gitkeep 保存。**目录存在 ≠ 模块已实现**。
+Python package 保留 __init__.py，占位目录由 .gitkeep 保存；**M01 已有少量实际模块与 unittest，目录存在 ≠ 其他阶段已实现**。完整映射见 [M01 baseline](../07-reproduction/m01-baseline.md)。
 
 ## 3. 九大业务 Category
 
@@ -128,7 +128,7 @@ nano-ar5iv/
 - quality：§QualityGate.assess()§。
 - runtime：§Sandbox / JobCheckpoint§。
 
-只有接口语义，没有运行代码。接口应在 M01 按真实样本逐步收紧，而非先制造过宽的通用框架。
+只有接口语义，除 M01 部分实际代码外没有后续功能。接口应在 M01 按真实样本逐步收紧，而非先制造过宽的通用框架。
 
 ## 4. 调用顺序与所有权
 
