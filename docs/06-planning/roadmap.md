@@ -1,8 +1,8 @@
-# 15｜分阶段交付路线图（M01 代码已提交，真实引擎验收待运行）
+# 15｜分阶段交付路线图（M02 基础实现，真实引擎与语料待验收）
 
 ## M00 — Documentation & Evidence（本 PR 目标）
 
-交付：原理、源码恢复、外部博客及 issue 研究、架构/目录、IR 契约、威胁模型、测试矩阵、ADR。M00-B 进一步添加完整 README、逐文件复现与时序设计、50 个 docstring-only .py 模块、14 个 __init__ 包占位及 tests/configs/deployment/examples/scripts 等真实占位目录。**状态：文档与源码占位已提交 PR 待审；业务代码、转换测试、运行服务均未实现。**
+交付：原理、源码恢复、外部博客及 issue 研究、架构/目录、IR 契约、威胁模型、测试矩阵、ADR。M00-B 进一步添加完整 README、逐文件复现与时序设计、50 个 docstring-only .py 模块、14 个 __init__ 包占位及 tests/configs/deployment/examples/scripts 等真实占位目录。**状态：PR #1/#2 已合并；M01/M02 有独立实现，M03–M07 仍为设计。**
 
 ## M01 — Foundation + Real Baseline
 
@@ -10,7 +10,7 @@
 
 ## M02 — Entrypoint Discovery
 
-计划：`00README.json`/legacy 兼容、目录 inventory、静态依赖图、候选评分、top-k 试转换、多个 root。**验收**：F01–F12 fixture 全覆盖；不确定性显式报告；与已知正例 baseline 比较。
+**已实现（M02 分支）**：现代/旧版 00README、源码清单和哈希验证、受限 ZIP/TAR 暂存、静态依赖图、候选评分、多 root 与 review-required、CLI discover 和唯一入口自动 convert。E01–E12 与附加安全单测已编写。**尚待验收**：真实 arXiv 样本准确率、top-k 引擎试转换、复杂 TeX 宏解析、Docker 实机回归。见 [M02 实施报告](../07-reproduction/m02-entry-discovery.md)。
 
 ## M03 — Conservative Recovery
 

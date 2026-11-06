@@ -2,10 +2,10 @@
 
 **Recoverable · Reproducible · Auditable LaTeX → XML → HTML5/MathML → PaperDocument**
 
-**项目状态：v0.3 M01 Engineering Baseline — 已实现源码快照、显式入口转换 CLI、Docker 引擎适配与产物记录。真实 LaTeXML 转换尚未在当前环境验证；M02–M07 仍为占位设计。**  
+**项目状态：v0.4 M02 Entry Discovery — M01 源码快照与转换基线、M02 元数据优先入口发现/静态依赖图/ZIP-TAR 暂存已有代码；真实 LaTeXML 转换及 M02 真实论文准确率未验收，M03–M07 尚未实现。**  
 最后更新：2026-11-06 · 语言：中文 / English terminology
 
-> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库仅部分 M01 模块已有真实逻辑，其余模块仍是占位文件；输出 HTML 不代表论文科学内容保真。
+> nano-ar5iv 不是 LaTeXML / ar5iv 的替代品，也不是其官方项目。我们设计的是**围绕成熟转换引擎**的论文源码发现、规范化、异常恢复、质量验证、批量处理和结构化输出系统。当前仓库 M01/M02 部分模块已有真实逻辑，M03–M07 仍为占位文件；输出 HTML 不代表论文科学内容保真。
 
 ## 目录
 
@@ -220,7 +220,7 @@ out/<job_id>/
 
 **验证不能只看 conversion rate**：同时跟踪入口定位准确率、公式符号保留率、引用连通率、资产完整率、修复的净收益、错误接受率、CPU/内存/超时和恢复可追溯性。
 
-测试层次：`unit`、`contract`、`integration`、`e2e`、`security`、`performance`；真实 arXiv 论文须记录 ID、版本、许可和独立判断。M01 已建立 16 个 unittest：15 通过、1 个真实 Docker 集成测试条件跳过；后续 M02–M07 黄金集仍为占位，也没有科学保真度验收结果。
+测试层次：`unit`、`contract`、`integration`、`e2e`、`security`、`performance`；真实 arXiv 论文须记录 ID、版本、许可和独立判断。M01 历史测试 16 项：15 通过、1 个真实 Docker 集成测试条件跳过；M02 新增 E01–E12 与安全测试（最终结果以 CI 为准），M03–M07 黄金集仍为占位，也没有科学保真度验收结果。
 
 TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执行层必须提供 archive path traversal 保护、no-network、无宿主凭据挂载、非 root、禁用 shell escape、CPU/内存/时间限额、HTML/SVG 隔离呈现；官方演示命令不等于生产隔离配置。
 
@@ -238,6 +238,7 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 | 官方资料、论文与社区评论 | [landscape](docs/03-research/landscape.md) / [issues](docs/03-research/issue-analysis.md) |
 | 总架构 | [system architecture](docs/04-architecture/system-architecture.md) |
 | **M01 实现与测试证据** | [M01 baseline](docs/07-reproduction/m01-baseline.md) |
+| **M02 入口发现实现及测试** | [M02 entry discovery](docs/07-reproduction/m02-entry-discovery.md) |
 | **端到端函数级复现蓝图** | [reproduction blueprint](docs/04-architecture/reproduction-blueprint.md) |
 | **实际占位文件目录与模块契约** | [module catalog](docs/04-architecture/module-catalog.md) |
 | Category 与依赖规则 | [code categories](docs/04-architecture/code-categories.md) |
@@ -255,9 +256,9 @@ TeX 包、图片、档案和输出 HTML 均视为**不可信输入**。未来执
 
 | 阶段 | 目标 | 当前状态 |
 |---|---|---|
-| M00 | 技术研究、代码体系和真实占位结构 | 已提交 PR #2、尚待合并 |
+| M00 | 技术研究、代码体系和真实占位结构 | PR #1、#2 已合并 |
 | M01 | 源码快照、CLI、固定镜像适配、provenance | **首批功能完成；真实 Docker/LaTeXML 验收待执行** |
-| M02 | 元数据优先的多 root 入口发现 | 仅设计 |
+| M02 | 元数据、多 root、依赖图、ZIP/TAR、安全拒判 | 已实现基础代码与自编测试；top-k 真实试转换及语料验证未完成 |
 | M03 | 有界恢复和独立修复工作区 | 仅设计 |
 | M04 | Canonical PaperDocument 和交叉引用图 | 仅设计 |
 | M05 | 公式/引用/图表的质量门禁 | 仅设计 |
